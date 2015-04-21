@@ -21,6 +21,8 @@ fi
 
 sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" in.gen.py > gen.py
 
+sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
+
 chmod +x gen.py
 
 echo "Configured."
