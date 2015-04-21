@@ -4,8 +4,8 @@ import re
 import subprocess
 
 
-vm_img_path = '/home/vmaffione/git/vm/irati.qcow2'
-ipcm_path = '/home/vmaffione/irati/local/bin/ipcm'
+install_path = "INSTALLPATH"
+vm_img_path = "VMIMGPATH"
 
 fin = open('gen.conf', 'r')
 
@@ -136,7 +136,7 @@ for i in vms:
     outs +=     'sudo modprobe shim-eth-vlan\n'\
                 'sudo modprobe normal-ipcp\n'\
                 'sudo modprobe rina-default-plugin\n'\
-                'sudo %(ipcmpath)s -c /etc/template.conf -l DBG &> log &\n'\
+                'sudo %(installpath)s/bin/ipcm -c /etc/template.conf -l DBG &> log &\n'\
                 '\n'\
                 'true\n'\
             'ENDSSH\n'\
@@ -144,7 +144,7 @@ for i in vms:
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
             '   fi\n'\
-            'done\n\n' % {'ipcmpath': ipcm_path}
+            'done\n\n' % {'installpath': install_path}
 
 
 for br in bridges:
