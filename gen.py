@@ -103,9 +103,9 @@ for i in vms:
         port['mac'] = mac
 
         outs += ''                                                      \
-        '-device e1000,mac=%(mac)s,netdev=data '                        \
-        '-netdev tap,ifname=%(tap)s,id=data,script=no,downscript=no '   \
-            % {'mac': mac, 'tap': tap}
+        '-device e1000,mac=%(mac)s,netdev=data%(idx)s '                 \
+        '-netdev tap,ifname=%(tap)s,id=data%(idx)s,script=no,downscript=no '\
+            % {'mac': mac, 'tap': tap, 'idx': port['idx']}
 
     outs += '&\n\n'
 
