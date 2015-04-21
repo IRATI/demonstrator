@@ -27,12 +27,15 @@ while trials < 4:
     trials += 1
     time.sleep(1)
 
-data = s.recv(1024)
-printalo(data)
+try:
+    data = s.recv(1024)
+    printalo(data)
 
-s.sendall(bytes('enroll-to-dif 4 n.DIF %s n.%s.IPCP 1\n' % (vlan, pvid), 'ascii'))
+    s.sendall(bytes('enroll-to-dif 4 n.DIF %s n.%s.IPCP 1\n' % (vlan, pvid), 'ascii'))
 
-data = s.recv(1024)
-printalo(data)
+    data = s.recv(1024)
+    printalo(data)
+except:
+    pass
 
 s.close()
