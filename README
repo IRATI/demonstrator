@@ -1,0 +1,2 @@
+(1) VM must have template.conf installed in /etc/
+(2) VM must have mac2ifname binary and enroll.py installed in $PATH

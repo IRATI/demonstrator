@@ -3,6 +3,7 @@
 # Echo client program
 import socket
 import sys
+import time
 
 def printalo(byt):
     print(repr(byt).replace('\\n', '\n'))
@@ -24,6 +25,7 @@ while trials < 4:
     except:
         pass
     trials += 1
+    time.sleep(1)
 
 data = s.recv(1024)
 printalo(data)

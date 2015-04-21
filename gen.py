@@ -4,6 +4,9 @@ import re
 import subprocess
 
 
+vm_img_path = '/home/vmaffione/git/vm/irati.qcow2'
+ipcm_path = '/home/vmaffione/irati/local/bin/ipcm'
+
 fin = open('gen.conf', 'r')
 
 vms = dict()
@@ -39,13 +42,8 @@ while 1:
 
 fin.close()
 
-print(vms)
-print(bridges)
-print(links)
 
-
-################### GENERATE UP SCRIPT #####################
-
+# up script
 fout = open('up.sh', 'w')
 
 outs =  '#!/bin/bash\n'             \
@@ -86,7 +84,7 @@ for i in vms:
     vm['ssh'] = fwdp
 
     outs += ''                                                  \
-            'qemu-system-x86_64 "/home/vmaffione/git/vm/irati.qcow2" '   \
+            'qemu-system-x86_64 "%(vmimage)s" '   \
             '-snapshot '                                                \
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
@@ -95,7 +93,8 @@ for i in vms:
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
-            '-display none ' % {'fwdp': fwdp, 'id': vmid, 'mac': mac}
+            '-display none ' % {'fwdp': fwdp, 'id': vmid, 'mac': mac,
+                                'vmimage': vm_img_path}
 
     for port in vm['ports']:
         tap = port['tap']
@@ -121,7 +120,7 @@ for i in vms:
             'set -x\n'\
             'sudo hostname %(name)s\n'\
             '\n'\
-            'sed -i "s|vmid|%(id)s|g" template.conf\n'\
+            'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id']}
 
     for port in vm['ports']:
@@ -129,15 +128,15 @@ for i in vms:
                 'sudo ip link set $PORT up\n'\
                 'sudo ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
                 'sudo ip link set $PORT.%(vlan)s up\n'\
-                'sed -i "s|ifc%(idx)s|$PORT|g" template.conf\n'\
-                'sed -i "s|vlan%(idx)s|%(vlan)s|g" template.conf\n'\
+                'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/template.conf\n'\
+                'sudo sed -i "s|vlan%(idx)s|%(vlan)s|g" /etc/template.conf\n'\
                     % {'mac': port['mac'], 'idx': port['idx'],
                        'id': vm['id'], 'vlan': port['vlan']}
 
     outs +=     'sudo modprobe shim-eth-vlan\n'\
                 'sudo modprobe normal-ipcp\n'\
                 'sudo modprobe rina-default-plugin\n'\
-                'sudo /home/vmaffione/irati/local/bin/ipcm -c /home/vmaffione/template.conf -l DBG &> log &\n'\
+                'sudo %(ipcmpath)s -c /etc/template.conf -l DBG &> log &\n'\
                 '\n'\
                 'true\n'\
             'ENDSSH\n'\
@@ -145,7 +144,7 @@ for i in vms:
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
             '   fi\n'\
-            'done\n\n'
+            'done\n\n' % {'ipcmpath': ipcm_path}
 
 
 for br in bridges:
@@ -160,6 +159,8 @@ for br in bridges:
 
     pvm_name = br_vms[0]
 
+    outs += 'sleep 5\n' # important!!
+
     for vm_name in br_vms:
         if vm_name == pvm_name:
             continue
@@ -170,7 +171,7 @@ for br in bridges:
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
-            '/home/vmaffione/enroll.py %(vlan)s %(pvid)s\n'\
+            'enroll.py %(vlan)s %(pvid)s\n'\
             'true\n'\
             'ENDSSH\n'\
             '   DONE=$?\n'\
@@ -189,11 +190,8 @@ fout.close()
 
 subprocess.call(['chmod', '+x', 'up.sh'])
 
-print(vms)
 
-
-################### GENERATE DOWN SCRIPT #####################
-
+# down script
 fout = open('down.sh', 'w')
 
 outs =  '#!/bin/bash\n'             \
