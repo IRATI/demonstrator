@@ -29,11 +29,12 @@ while 1:
         bridges.append(name)
         continue
 
-    m = re.match(r'\s*link\s+(\w+)\s+(\w+)', line)
+    m = re.match(r'\s*link\s+(\w+)\s+(\w+)\s+(\d+)', line)
     if m:
         bridge = m.group(1)
         vm = m.group(2)
-        links.append((bridge, vm))
+        vlan = m.group(3)
+        links.append((bridge, vm, vlan))
         continue
 
 fin.close()
@@ -58,7 +59,7 @@ for b in bridges:
             '\n' % {'br': b}
 
 for l in links:
-    b, vm = l
+    b, vm, vlan = l
     idx = len(vms[vm]['ports']) + 1
     tap = '%s.%02x' % (vm, idx)
 
@@ -67,7 +68,8 @@ for l in links:
             'sudo brctl addif %(br)s %(tap)s\n\n'           \
                 % {'tap': tap, 'br': b}
 
-    vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx})
+    vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx,
+                             'vlan': vlan})
 
 
 vmid = 1
@@ -83,11 +85,11 @@ for i in vms:
     vm['ssh'] = fwdp
 
     outs += ''                                                  \
-            'qemu-system-x86_64 "/home/vmaffione/git/vm/arch.qcow2" '   \
+            'qemu-system-x86_64 "/home/vmaffione/git/vm/irati.qcow2" '   \
             '-snapshot '                                                \
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
-            '-m 512M '                                                  \
+            '-m 256M '                                                  \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-vga std '                                                 \
@@ -100,7 +102,7 @@ for i in vms:
         port['mac'] = mac
 
         outs += ''                                                      \
-        '-device virtio-net-pci,mac=%(mac)s,netdev=data '               \
+        '-device e1000,mac=%(mac)s,netdev=data '                        \
         '-netdev tap,ifname=%(tap)s,id=data,script=no,downscript=no '   \
             % {'mac': mac, 'tap': tap}
 
@@ -115,32 +117,30 @@ for i in vms:
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
+            'set -x\n'\
             'sudo hostname %(name)s\n'\
             '\n'\
-            'sudo modprobe rinalite\n'\
-            'sudo modprobe rinalite-shim-eth\n'\
-            'sudo modprobe rinalite-normal\n'\
-            'sudo chmod a+rwx /dev/rinalite\n'\
-            'sudo chmod a+rwx /dev/rina-io\n'\
-            'sudo mkdir -p /var/rinalite\n'\
-            'sudo chmod -R a+rw /var/rinalite\n'\
-            '\n'\
-            'rinalite-uipcps &> uipcp.log &\n'\
-            'rina-config ipcp-create n.IPCP %(id)s normal n.DIF\n'\
-            'rina-config ipcp-config n.IPCP %(id)s address %(id)d\n'\
+            'sed -i "s|vmid|%(id)s|g" template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'],
                    'id': vm['id']}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
                 'sudo ip link set $PORT up\n'\
-                'rina-config ipcp-create e.IPCP %(idx)s shim-eth e.%(idx)s.DIF\n'\
-                'rina-config ipcp-config e.IPCP %(idx)s netdev $PORT\n'\
-                'rina-config ipcp-register e.%(idx)s.DIF n.IPCP %(id)s\n'\
+                'sudo ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
+                'sudo ip link set $PORT.%(vlan)s up\n'\
+                'sed -i "s|ifc%(idx)s|$PORT|g" template.conf\n'\
+                'sed -i "s|vlan%(idx)s|%(vlan)s|g" template.conf\n'\
                     % {'mac': port['mac'], 'idx': port['idx'],
-                       'id': vm['id']}
+                       'id': vm['id'], 'vlan': port['vlan']}
 
-    outs += 'ENDSSH\n'\
+    outs +=     'sudo modprobe shim-eth-vlan\n'\
+                'sudo modprobe normal-ipcp\n'\
+                'sudo modprobe rina-default-plugin\n'\
+                'sudo /home/vmaffione/irati/local/bin/ipcm -c /home/vmaffione/template.conf -l DBG &> log &\n'\
+                '\n'\
+                'true\n'\
+            'ENDSSH\n'\
             '   DONE=$?\n'\
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
@@ -169,9 +169,9 @@ for i in vms:
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
-            'rina-config ipcp-enroll n.DIF n.IPCP %(id)s '\
+            '#rina-config ipcp-enroll n.DIF n.IPCP %(id)s '\
                                     'n.IPCP %(pvid)s e.1.DIF\n'\
-            'rina-config ipcp-dft-set n.IPCP %(id)s rinaperf-data server 1\n'\
+            '#rina-config ipcp-dft-set n.IPCP %(id)s rinaperf-data server 1\n'\
             'ENDSSH\n'\
             '   DONE=$?\n'\
             '   if [ $DONE != "0" ]; then\n'\

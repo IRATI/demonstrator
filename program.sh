@@ -2,7 +2,7 @@
 
 set -x
 
-qemu-system-x86_64 "/home/vmaffione/git/vm/arch.qcow2"          \
+qemu-system-x86_64 "/home/vmaffione/git/vm/irati.qcow2"          \
     --enable-kvm                                                \
     -smp 2                                                      \
     -m 1G                                                       \
