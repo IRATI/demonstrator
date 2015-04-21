@@ -1,13 +1,13 @@
 ####### Requirements #######
 
 - Install QEMU
-- Prepare a QEMU VM with the IRATI stack installed in
+- Prepare a QEMU VM image with the IRATI stack installed in
 
 
 ####### Instructions - please follow the specified order ########
 
 (1) Run ./configure script to set the IRATI installation path on the VM
-    and the path of the VM image on the host file system
+    and the path of the QEMU VM image on the host file system
 
 (2) Copy template.conf in /etc/template.conf on the VM
 
