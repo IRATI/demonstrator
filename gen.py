@@ -7,7 +7,7 @@ import subprocess
 fin = open('gen.conf', 'r')
 
 vms = dict()
-bridges = []
+bridges = dict()
 links = []
 
 while 1:
@@ -23,18 +23,18 @@ while 1:
         vms[name] = {'name': name, 'ports': []}
         continue
 
-    m = re.match(r'\s*bridge\s+(\w+)', line)
+    m = re.match(r'\s*bridge\s+(\w+)\s+(\d+)', line)
     if m:
         name = m.group(1)
-        bridges.append(name)
+        vlan = m.group(2)
+        bridges[name] = {'name': name, 'vlan': vlan}
         continue
 
-    m = re.match(r'\s*link\s+(\w+)\s+(\w+)\s+(\d+)', line)
+    m = re.match(r'\s*link\s+(\w+)\s+(\w+)', line)
     if m:
         bridge = m.group(1)
         vm = m.group(2)
-        vlan = m.group(3)
-        links.append((bridge, vm, vlan))
+        links.append((bridge, vm))
         continue
 
 fin.close()
@@ -59,7 +59,8 @@ for b in bridges:
             '\n' % {'br': b}
 
 for l in links:
-    b, vm, vlan = l
+    b, vm = l
+    vlan = bridges[b]['vlan']
     idx = len(vms[vm]['ports']) + 1
     tap = '%s.%02x' % (vm, idx)
 
@@ -121,8 +122,7 @@ for i in vms:
             'sudo hostname %(name)s\n'\
             '\n'\
             'sed -i "s|vmid|%(id)s|g" template.conf\n'\
-            '\n' % {'name': vm['name'], 'ssh': vm['ssh'],
-                   'id': vm['id']}
+            '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id']}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -148,37 +148,40 @@ for i in vms:
             'done\n\n'
 
 
-# Choose the VM with id 1 as enrollment pivot
-pvm = None
-for i in vms:
-    if vms[i]['id'] == 1:
-        pvm = vms[i]
+for br in bridges:
+    br_vms = []
+    for l in links:
+        b, vm = l
+        if b == br:
+            br_vms.append(vm)
 
-assert pvm != None
-
-# Enroll everybody against the pivot VM
-for i in vms:
-    vm = vms[i]
-    if vm['id'] == pvm['id']:
-        # Skip the pivot VM
+    if len(br_vms) < 2:
         continue
 
-    # XXX watch out: e.1.DIF is hardcoded here, waiting
-    # for a fix to come
-    outs += ''\
+    pvm_name = br_vms[0]
+
+    for vm_name in br_vms:
+        if vm_name == pvm_name:
+            continue
+
+        vm = vms[vm_name]
+
+        outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
-            '#rina-config ipcp-enroll n.DIF n.IPCP %(id)s '\
-                                    'n.IPCP %(pvid)s e.1.DIF\n'\
-            '#rina-config ipcp-dft-set n.IPCP %(id)s rinaperf-data server 1\n'\
+            '/home/vmaffione/enroll.py %(vlan)s %(pvid)s\n'\
+            'true\n'\
             'ENDSSH\n'\
             '   DONE=$?\n'\
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
             '   fi\n'\
             'done\n\n' % {'ssh': vm['ssh'], 'id': vm['id'],
-                          'pvid': pvm['id']}
+                          'pvid': vms[pvm_name]['id'],
+                          'vlan': bridges[br]['vlan']}
+
+    print("bridge %s vms %s"% (br, br_vms))
 
 fout.write(outs)
 
