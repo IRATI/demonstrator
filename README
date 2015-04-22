@@ -1,7 +1,9 @@
 ####### Requirements #######
 
-- Install QEMU
-- Prepare a QEMU VM image with the IRATI stack installed in
+- QEMU
+- brctl command line tool (can be found in distro packages like
+  bridge-utils)
+- QEMU VM image with the IRATI stack installed in
 
 
 ####### Instructions - please follow the specified order ########
