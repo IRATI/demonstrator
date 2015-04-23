@@ -19,6 +19,9 @@ if [ -n "$2" ]; then
 	VMIMGPATH=$2
 fi
 
+echo "INSTALLPATH=$INSTALLPATH"
+echo "VMIMGPATH=$VMIMGPATH"
+
 sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" in.gen.py > gen.py
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
