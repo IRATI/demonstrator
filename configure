@@ -19,8 +19,13 @@ if [ -n "$2" ]; then
 	VMIMGPATH=$2
 fi
 
-echo "INSTALLPATH=$INSTALLPATH"
-echo "VMIMGPATH=$VMIMGPATH"
+if [ ! -f $VMIMGPATH ]; then
+    echo "Error: VM image $VMIMGPATH does not exist"
+    exit 1
+fi
+
+echo "INSTALLPATH = $INSTALLPATH"
+echo "VMIMGPATH = $VMIMGPATH"
 
 sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" in.gen.py > gen.py
 
