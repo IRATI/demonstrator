@@ -39,8 +39,11 @@
      software), run ./program.sh and access the VM at
           ssh -p2222 ${username}@localhost
 
+     Don't try to run ./program.sh while the test is running (i.e. you've run
+     ./up.sh but still not run ./down.sh).
 
-####### Automatic login #######
+
+####### Autologin to the VMs #######
 
 It's highly recommended to use SSH keys to avoid inserting the password again
 and again (during the tests):
