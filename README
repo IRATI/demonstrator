@@ -8,9 +8,10 @@
 
 ####### Instructions - please follow the specified order ########
 
-(1) Run ./configure script to set the IRATI installation path on the VM,
-    the path of the QEMU VM image on the host file system and the
-    login username on the VM
+(1) Run ./configure script to set the IRATI installation path (on the VM
+    filesystem), the path of the QEMU VM image (on your physical machine
+    file system) and the login username on the VM
+    (referred to as ${username} in the following)
 
 (2) Copy template.conf in /etc/template.conf on the VM
 
@@ -28,7 +29,7 @@
 (8) VMs are accessible at localhost ports 2223, 2224, 2225, etc.
 	e.g. ssh -p2223 ${username}@localhost
 
-(9) Perform your tests on the VMs using ssh
+(9) Perform your tests on the VMs using ssh (8)
 
 (10) Shutdown the scenario (destroying the VMs) using ./down.sh
 
@@ -37,5 +38,21 @@
      To make persistent modifications to the VM image (e.g. to update PRISTINE
      software), run ./program.sh and access the VM at
           ssh -p2222 ${username}@localhost
+
+
+####### Automatic login #######
+
+It's highly recommended to use SSH keys to avoid inserting the password again
+and again (during the tests):
+
+    (a.1) $ ./program.sh
+    (a.2) $ ssh-keygen -t rsa  # e.g. save the key in /home/${me}/.ssh/pristine_rsa
+    (a.3) $ ssh-copy-id -p2222 ${username}@localhost
+    (a.4) shutdown the VM
+
+[http://serverfault.com/questions/241588/how-to-automate-ssh-login-with-password]
+
+Now you should be able to run ./up.sh without the need to insert the password
+
 
 Vincenzo
