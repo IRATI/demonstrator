@@ -6,6 +6,7 @@ import subprocess
 
 install_path = "INSTALLPATH"
 vm_img_path = "VMIMGPATH"
+username = "USERNAME"
 
 fin = open('gen.conf', 'r')
 
@@ -116,12 +117,13 @@ for i in vms:
     outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
+            '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
             'sudo hostname %(name)s\n'\
             '\n'\
             'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
-            '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id']}
+            '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
+                    'username': username}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -170,7 +172,7 @@ for br in bridges:
         outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   ssh -p %(ssh)s localhost << \'ENDSSH\'\n'\
+            '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'enroll.py %(vlan)s %(pvid)s\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -180,7 +182,8 @@ for br in bridges:
             '   fi\n'\
             'done\n\n' % {'ssh': vm['ssh'], 'id': vm['id'],
                           'pvid': vms[pvm_name]['id'],
-                          'vlan': bridges[br]['vlan']}
+                          'vlan': bridges[br]['vlan'],
+                          'username': username}
 
     print("bridge %s vms %s"% (br, br_vms))
 
@@ -238,3 +241,25 @@ fout.write(outs)
 fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
+
+# program script
+fout = open('program.sh', 'w')
+
+outs  = '#!/bin/bash\n'                                             \
+        '\n'                                                        \
+        'set -x\n'                                                  \
+        '\n'                                                        \
+        'qemu-system-x86_64 "%(vmimage)s" '                         \
+        '--enable-kvm '                                             \
+        '-smp 2 '                                                   \
+        '-m 1024M '                                                 \
+        '-device e1000,netdev=mgmt '                                \
+        '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
+        '-vga std' % {'fwdp': 2222, 'vmimage': vm_img_path}
+
+fout.write(outs)
+
+fout.close()
+
+subprocess.call(['chmod', '+x', 'program.sh'])
+

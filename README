@@ -8,8 +8,9 @@
 
 ####### Instructions - please follow the specified order ########
 
-(1) Run ./configure script to set the IRATI installation path on the VM
-    and the path of the QEMU VM image on the host file system
+(1) Run ./configure script to set the IRATI installation path on the VM,
+    the path of the QEMU VM image on the host file system and the
+    login username on the VM
 
 (2) Copy template.conf in /etc/template.conf on the VM
 
@@ -25,11 +26,16 @@
 (7) Use ./up.sh to bootstrap the scenario
 
 (8) VMs are accessible at localhost ports 2223, 2224, 2225, etc.
-	e.g. ssh -p2223 localhost
+	e.g. ssh -p2223 ${username}@localhost
 
 (9) Perform your tests on the VMs using ssh
 
-(10) Shutdown the scenario using ./down.sh
+(10) Shutdown the scenario (destroying the VMs) using ./down.sh
 
+(11) VMs launched by ./up.sh have a non-persistent disk --> modifications
+     will be lost at shutdown time (10).
+     To make persistent modifications to the VM image (e.g. to update PRISTINE
+     software), run ./program.sh and access the VM at
+          ssh -p2222 ${username}@localhost
 
 Vincenzo

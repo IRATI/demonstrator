@@ -8,6 +8,7 @@ function usage()
 
 INSTALLPATH=/home/vmaffione/irati/local
 VMIMGPATH=/home/vmaffione/git/vm/irati.qcow2
+USERNAME=vmaffione
 
 usage
 
@@ -19,6 +20,10 @@ if [ -n "$2" ]; then
 	VMIMGPATH=$2
 fi
 
+if [ -n "$3" ]; then
+	USERNAME=$3
+fi
+
 if [ ! -f $VMIMGPATH ]; then
     echo "Error: VM image $VMIMGPATH does not exist"
     exit 1
@@ -26,8 +31,9 @@ fi
 
 echo "INSTALLPATH = $INSTALLPATH"
 echo "VMIMGPATH = $VMIMGPATH"
+echo "USERNAME= $USERNAME"
 
-sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" in.gen.py > gen.py
+sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" -e "s|USERNAME|$USERNAME|g" in.gen.py > gen.py
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
 
