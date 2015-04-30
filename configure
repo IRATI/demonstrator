@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#
+# Author: Vincenzo Maffione <v.maffione@nextworks.it>
+#
 
 function usage()
 {

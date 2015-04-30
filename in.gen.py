@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+#
+# Author: Vincenzo Maffione <v.maffione@nextworks.it>
+#
+
 import re
 import subprocess
 

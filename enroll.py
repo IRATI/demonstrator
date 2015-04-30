@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-# Echo client program
+#
+# Author: Vincenzo Maffione <v.maffione@nextworks.it>
+#
+
 import socket
 import sys
 import time
