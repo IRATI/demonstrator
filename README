@@ -13,11 +13,11 @@
     file system) and the login username on the VM
     (referred to as ${username} in the following)
 
-(2) Copy template.conf in /etc/template.conf on the VM
+(2) Copy template.conf, default.dif, and shimeth*.dif in /etc/ on the VM
 
 (3) Copy enroll.py to /usr/bin (or other $PATH element) on the VM
 
-(4) Compile mac2ifname.c into mac2ifname and copy it to /usr/bin
+(4) Compile mac2ifname.c into mac2ifname and copy the later to /usr/bin
     (or other $PATH element) on the VM
 
 (5) Specify the desired topology in gen.conf
