@@ -145,7 +145,7 @@ for i in vms:
     outs +=     'sudo modprobe shim-eth-vlan\n'\
                 'sudo modprobe normal-ipcp\n'\
                 'sudo modprobe rina-default-plugin\n'\
-                'sudo %(installpath)s/bin/ipcm -c /etc/template.conf -l DEBUG &> log &\n'\
+                'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" -c /etc/template.conf -l DEBUG &> log &\n'\
                 '\n'\
                 'true\n'\
             'ENDSSH\n'\
