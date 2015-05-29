@@ -146,7 +146,7 @@ for i in vms:
                 'sudo modprobe normal-ipcp\n'\
                 'sudo modprobe rina-default-plugin\n'\
                 'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" -c /etc/template.conf -l DEBUG &> log &\n'\
-                '\n'\
+                'sleep 1\n'\
                 'true\n'\
             'ENDSSH\n'\
             '   DONE=$?\n'\
@@ -168,7 +168,7 @@ for br in bridges:
 
     pvm_name = br_vms[0]
 
-    outs += 'sleep 5\n' # important!!
+    outs += 'sleep 2\n' # important!!
 
     for vm_name in br_vms:
         if vm_name == pvm_name:
@@ -181,6 +181,7 @@ for br in bridges:
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'enroll.py %(vlan)s %(pvid)s\n'\
+            'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
             '   DONE=$?\n'\
