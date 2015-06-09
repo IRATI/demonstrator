@@ -87,6 +87,7 @@ for i in vms:
     vm['id'] = vmid
 
     fwdp = 2222 + vmid
+    fwdc = fwdp + 10000
     mac = '00:0a:0a:0a:%02x:%02x' % (vmid, 99)
 
     vm['ssh'] = fwdp
@@ -99,10 +100,11 @@ for i in vms:
             '-m 256M '                                                  \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
+            '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '             \
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
             '-display none ' % {'fwdp': fwdp, 'id': vmid, 'mac': mac,
-                                'vmimage': vm_img_path}
+                                'vmimage': vm_img_path, 'fwdc': fwdc}
 
     for port in vm['ports']:
         tap = port['tap']
