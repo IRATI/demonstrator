@@ -265,7 +265,7 @@ outs  = '#!/bin/bash\n'                                             \
         '-m 1024M '                                                 \
         '-device e1000,netdev=mgmt '                                \
         '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
-        '-vga std' % {'fwdp': 2222, 'vmimage': vm_img_path}
+        '-vga std &' % {'fwdp': 2222, 'vmimage': vm_img_path}
 
 fout.write(outs)
 
