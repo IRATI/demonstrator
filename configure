@@ -40,6 +40,8 @@ sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" -e "s|USERNA
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
 
+sed "s|VMIMGPATH|$VMIMGPATH|g" in.program.sh > program.sh
+
 chmod +x gen.py
 
 echo "Configured."
