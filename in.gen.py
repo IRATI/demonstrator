@@ -97,7 +97,7 @@ for i in vms:
             '-snapshot '                                                \
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
-            '-m 256M '                                                  \
+            '-m 128M '                                                  \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '             \

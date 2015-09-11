@@ -6,7 +6,7 @@
 
 function usage()
 {
-	echo "help: configure INSTALLPATH VMIMGPATH"
+	echo "help: configure INSTALLPATH VMIMGPATH USERNAME"
 }
 
 INSTALLPATH=/home/vmaffione/irati/local
