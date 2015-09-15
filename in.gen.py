@@ -59,7 +59,7 @@ outs =  '#!/bin/bash\n'             \
         'set -x\n'                  \
         '\n';
 
-for b in bridges:
+for b in sorted(bridges):
     outs += 'sudo brctl addbr %(br)s\n'         \
             'sudo ip link set %(br)s up\n'      \
             '\n' % {'br': b}
@@ -81,7 +81,7 @@ for l in links:
 
 vmid = 1
 
-for i in vms:
+for i in sorted(vms):
     vm = vms[i]
 
     vm['id'] = vmid
@@ -120,7 +120,7 @@ for i in vms:
 
     vmid += 1
 
-for i in vms:
+for i in sorted(vms):
     vm = vms[i]
 
     outs += ''\
@@ -158,7 +158,7 @@ for i in vms:
             'done\n\n' % {'installpath': install_path}
 
 
-for br in bridges:
+for br in sorted(bridges):
     br_vms = []
     for l in links:
         b, vm = l
@@ -224,13 +224,13 @@ outs =  '#!/bin/bash\n'             \
         '   rm $PIDFILE\n'                                      \
         '}\n\n'
 
-for i in vms:
+for i in sorted(vms):
     vm = vms[i]
     outs += 'kill_qemu rina-%(id)s.pid\n' % {'id': vm['id']}
 
 outs += '\n'
 
-for i in vms:
+for i in sorted(vms):
     vm = vms[i]
     for port in vm['ports']:
         tap = port['tap']
@@ -241,7 +241,7 @@ for i in vms:
                 'sudo ip tuntap del mode tap name %(tap)s\n\n'  \
                     % {'tap': tap, 'br': b}
 
-for b in bridges:
+for b in sorted(bridges):
     outs += 'sudo ip link set %(br)s down\n'        \
             'sudo brctl delbr %(br)s\n'             \
             '\n' % {'br': b}
