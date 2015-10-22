@@ -38,8 +38,8 @@
                         }
                    }
               }
-          } 
-       }, { 
+          }
+       }, {
      	 "name" : "reliablewithflowcontrol",
          "id" : 2,
          "partialDelivery" : false,
@@ -73,7 +73,7 @@
              		}
            	  }
          }
-     } ], 
+     } ],
         "knownIPCProcessAddresses": [
             {
                 "apName": "n.1.IPCP",
@@ -582,9 +582,9 @@
   	  }, {
     	 "addressPrefix" : 16,
     	 "organization" : "IRATI"
-      } ], 
+      } ],
      "rmtConfiguration" : {
-        "pftConfiguration" : {     
+        "pffConfiguration" : {
           "policySet" : {
             "name" : "default",
             "version" : "0"
@@ -596,9 +596,9 @@
         }
      },
      "enrollmentTaskConfiguration" : {
-        "policySet" : { 
+        "policySet" : {
            "name" : "default",
-           "version" : "1", 
+           "version" : "1",
            "parameters" : [{
                "name"  : "enrollTimeoutInMs",
                "value" : "10000"
@@ -617,10 +617,10 @@
              }]
         }
      },
-     "flowAllocatorConfiguration" : { 
-         "policySet" : { 
+     "flowAllocatorConfiguration" : {
+         "policySet" : {
            "name" : "default",
-           "version" : "1" 
+           "version" : "1"
           }
      },
      "namespaceManagerConfiguration" : {
@@ -636,7 +636,7 @@
            }
      },
      "resourceAllocatorConfiguration" : {
-         "pduftgConfiguration" : {    
+         "pduftgConfiguration" : {
            "policySet" : {
              "name" : "default",
              "version" : "0"
@@ -664,7 +664,7 @@
              "value" : "101"
            },{
              "name"  : "waitUntilAgeIncrement",
-             "value" : "997" 
+             "value" : "997"
            },{
              "name"  : "routingAlgorithm",
              "value" : "Dijkstra"
