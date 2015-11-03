@@ -5,6 +5,7 @@
 #
 
 import re
+import argparse
 import subprocess
 
 
@@ -12,6 +13,12 @@ install_path = "INSTALLPATH"
 vm_img_path = "VMIMGPATH"
 username = "USERNAME"
 
+argparser = argparse.ArgumentParser()
+argparser.add_argument('-p', '--base-port',
+                       help = "Base port for VMs",
+                       type = int, default = 2222)
+
+args = argparser.parse_args()
 fin = open('gen.conf', 'r')
 
 vms = dict()
@@ -86,7 +93,7 @@ for i in sorted(vms):
 
     vm['id'] = vmid
 
-    fwdp = 2222 + vmid
+    fwdp = args.base_port + vmid
     fwdc = fwdp + 10000
     mac = '00:0a:0a:0a:%02x:%02x' % (vmid, 99)
 
@@ -265,7 +272,7 @@ outs  = '#!/bin/bash\n'                                             \
         '-m 1024M '                                                 \
         '-device e1000,netdev=mgmt '                                \
         '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
-        '-vga std &' % {'fwdp': 2222, 'vmimage': vm_img_path}
+        '-vga std &' % {'fwdp': args.base_port, 'vmimage': vm_img_path}
 
 fout.write(outs)
 
