@@ -189,7 +189,8 @@ for br in sorted(bridges):
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
-            'enroll.py %(vlan)s %(pvid)s\n'\
+            'set -x\n'\
+            'sudo enroll.py %(vlan)s %(pvid)s\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\

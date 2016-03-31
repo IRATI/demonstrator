@@ -18,12 +18,12 @@ pvid = sys.argv[2]
 HOST = '127.0.0.1'    # The remote host
 PORT = 32766              # The same port as used by the server
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
 trials = 0
 while trials < 4:
     try:
-        s.connect((HOST, PORT))
+        s.connect("INSTALLPATH/var/ipcm-console.sock")
         break
     except:
         pass

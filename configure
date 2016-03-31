@@ -42,6 +42,9 @@ sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
 
 sed "s|VMIMGPATH|$VMIMGPATH|g" in.program.sh > program.sh
 
+sed "s|INSTALLPATH|$INSTALLPATH|g" in.enroll.py > enroll.py
+chmod +x enroll.py
+
 chmod +x gen.py
 
 echo "Configured."
