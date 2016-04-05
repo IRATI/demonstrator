@@ -23,7 +23,7 @@ s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 trials = 0
 while trials < 4:
     try:
-        s.connect("INSTALLPATH/var/ipcm-console.sock")
+        s.connect("INSTALLPATH/var/run/ipcm-console.sock")
         break
     except:
         pass
