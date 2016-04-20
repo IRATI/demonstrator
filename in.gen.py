@@ -261,7 +261,7 @@ fout.close()
 subprocess.call(['chmod', '+x', 'down.sh'])
 
 # program script
-fout = open('program.sh', 'w')
+fout = open('update_vm.sh', 'w')
 
 outs  = '#!/bin/bash\n'                                             \
         '\n'                                                        \
@@ -279,5 +279,5 @@ fout.write(outs)
 
 fout.close()
 
-subprocess.call(['chmod', '+x', 'program.sh'])
+subprocess.call(['chmod', '+x', 'update_vm.sh'])
 

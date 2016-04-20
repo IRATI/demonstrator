@@ -41,10 +41,10 @@
 (11) VMs launched by ./up.sh have a non-persistent disk --> modifications
      will be lost at shutdown time (10).
      To make persistent modifications to the VM image (e.g. to update PRISTINE
-     software), run ./program.sh and access the VM at
+     software), run ./update_vm.sh and access the VM at
           ssh -p2222 ${username}@localhost
 
-     Don't try to run ./program.sh while the test is running (i.e. you've run
+     Don't try to run ./update_vm.sh while the test is running (i.e. you've run
      ./up.sh but still not run ./down.sh).
 
 
@@ -53,7 +53,7 @@
 It's highly recommended to use SSH keys to avoid inserting the password again
 and again (during the tests):
 
-    (a.1) $ ./program.sh
+    (a.1) $ ./update_vm.sh
     (a.2) $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
     (a.3) $ ssh-copy-id -p2222 ${username}@localhost
     (a.4) shutdown the VM

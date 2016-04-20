@@ -40,7 +40,7 @@ sed -e "s|INSTALLPATH|$INSTALLPATH|g" -e "s|VMIMGPATH|$VMIMGPATH|g" -e "s|USERNA
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
 
-sed "s|VMIMGPATH|$VMIMGPATH|g" in.program.sh > program.sh
+sed "s|VMIMGPATH|$VMIMGPATH|g" in.update_vm.sh > update_vm.sh
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.enroll.py > enroll.py
 chmod +x enroll.py
