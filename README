@@ -3,15 +3,20 @@
 - QEMU
 - brctl command line tool (can be found in distro packages like
   bridge-utils)
-- QEMU VM image with the IRATI stack installed in
+- QEMU VM image containing:
+    - the IRATI stack installed in
+    - python
+    - sudo enabled for the login username on the VM (referred to as
+      ${username} in the following), with NOPASSWD, e.g. /etc/sudoers
+      should contain something similar to the following line:
+            %wheel ALL=(ALL) NOPASSWD: ALL
 
 
 ####### Instructions - please follow the specified order ########
 
 (1) Run ./configure script to set the IRATI installation path (on the VM
     filesystem), the path of the QEMU VM image (on your physical machine
-    file system) and the login username on the VM
-    (referred to as ${username} in the following)
+    file system) and the login username on the VM (${username})
 
 (2) Copy template.conf, default.dif, and shimeth*.dif in /etc/ on the VM
 
@@ -49,13 +54,25 @@ It's highly recommended to use SSH keys to avoid inserting the password again
 and again (during the tests):
 
     (a.1) $ ./program.sh
-    (a.2) $ ssh-keygen -t rsa  # e.g. save the key in /home/${me}/.ssh/pristine_rsa
+    (a.2) $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
     (a.3) $ ssh-copy-id -p2222 ${username}@localhost
     (a.4) shutdown the VM
 
 [http://serverfault.com/questions/241588/how-to-automate-ssh-login-with-password]
 
 Now you should be able to run ./up.sh without the need to insert the password
+
+
+####### Other notes #######
+
+If you happen to see in the logs errors referencing "vlanX" names,
+similar to the following:
+
+    rina-shim-eth-vlan(ERR): Error converting DIF Name to VLAN ID: vlan3
+    rina-kipcm(ERR): Assign to dif vlan3/// operation failed for IPC process 3
+
+don't worry, it is not a real error. We are working on improving the generated configuration
+file, in order avoid this to show up.
 
 
 Vincenzo
