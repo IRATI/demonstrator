@@ -6,6 +6,7 @@
 
 import re
 import subprocess
+import json
 
 
 env_dict = {}
@@ -79,6 +80,38 @@ while 1:
 
 fin.close()
 
+ipcmconf = {
+            "configFileVersion": "1.4.1",
+            "localConfiguration": {
+                "installationPath": "%(installpath)s/bin",
+                "libraryPath": "%(installpath)s/lib",
+                "logPath": "%(installpath)s/var/log",
+                "consoleSocket": "%(installpath)s/var/run/ipcm-console.sock",
+                "pluginsPaths": [
+                        "%(installpath)s/lib/rinad/ipcp",
+                        "/lib/modules/4.1.10-irati/extra"
+                ]
+                },
+
+            "applicationToDIFMappings": [
+                {
+                    "encodedAppName": "rina.apps.echotime.server-1--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime.client-1--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime-2--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime.client-2--",
+                    "difName": "n.DIF"
+                }
+            ],
+        }
 
 # up script
 fout = open('up.sh', 'w')
@@ -93,7 +126,7 @@ for b in sorted(bridges):
             'sudo ip link set %(br)s up\n'      \
             '\n' % {'br': b}
 
-for l in links:
+for l in sorted(links):
     b, vm = l
     vlan = bridges[b]['vlan']
     idx = len(vms[vm]['ports']) + 1
@@ -201,7 +234,7 @@ for br in sorted(bridges):
 
     outs += 'sleep 2\n' # important!!
 
-    for vm_name in br_vms:
+    for vm_name in sorted(br_vms):
         if vm_name == pvm_name:
             continue
 
@@ -281,4 +314,8 @@ fout.write(outs)
 fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
+
+# Generate the IPCM configuration files
+ipcmconfstr = json.dumps(ipcmconf, indent=4, sort_keys=True) % env_dict
+print(ipcmconfstr)
 
