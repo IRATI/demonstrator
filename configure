@@ -6,11 +6,10 @@
 
 function usage()
 {
-	echo "help: configure INSTALLPATH VMIMGPATH"
+	echo "help: configure INSTALLPATH"
 }
 
 INSTALLPATH=/home/vmaffione/irati/local
-VMIMGPATH=/home/vmaffione/git/vm/irati.qcow2
 
 usage
 
@@ -18,20 +17,8 @@ if [ -n "$1" ]; then
 	INSTALLPATH=$1
 fi
 
-if [ -n "$2" ]; then
-	VMIMGPATH=$2
-fi
-
-if [ ! -f $VMIMGPATH ]; then
-    echo "Error: VM image $VMIMGPATH does not exist"
-    exit 1
-fi
-
 echo "INSTALLPATH = $INSTALLPATH"
-echo "VMIMGPATH = $VMIMGPATH"
 
 sed "s|INSTALLPATH|$INSTALLPATH|g" in.template.conf > template.conf
-
-sed "s|VMIMGPATH|$VMIMGPATH|g" in.update_vm.sh > update_vm.sh
 
 echo "Configured."
