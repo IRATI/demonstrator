@@ -9,9 +9,7 @@ import argparse
 import subprocess
 
 
-install_path = "INSTALLPATH"
-vm_img_path = "VMIMGPATH"
-username = "USERNAME"
+env_dict = {}
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-p', '--base-port',
@@ -19,6 +17,27 @@ argparser.add_argument('-p', '--base-port',
                        type = int, default = 2222)
 
 args = argparser.parse_args()
+
+fin = open('gen.env', 'r')
+while 1:
+    line = fin.readline()
+    if line == '':
+        break
+
+    m = re.match(r'(\S+)\s*=\s*(\S+)', line)
+    if m == None:
+        continue
+
+    key = m.group(1)
+    value = m.group(2)
+
+    if key not in ['vmimgpath', 'installpath', 'username']:
+        print('Unrecognized keyword %s' % (key))
+        continue
+
+    env_dict[key] = value
+fin.close()
+
 fin = open('gen.conf', 'r')
 
 vms = dict()
@@ -111,7 +130,7 @@ for i in sorted(vms):
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
             '-display none ' % {'fwdp': fwdp, 'id': vmid, 'mac': mac,
-                                'vmimage': vm_img_path, 'fwdc': fwdc}
+                                'vmimage': env_dict['vmimgpath'], 'fwdc': fwdc}
 
     for port in vm['ports']:
         tap = port['tap']
@@ -139,7 +158,7 @@ for i in sorted(vms):
             '\n'\
             'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
-                    'username': username}
+                    'username': env_dict['username']}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -162,7 +181,7 @@ for i in sorted(vms):
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
             '   fi\n'\
-            'done\n\n' % {'installpath': install_path}
+            'done\n\n' % env_dict
 
 
 for br in sorted(bridges):
@@ -201,7 +220,7 @@ for br in sorted(bridges):
             'done\n\n' % {'ssh': vm['ssh'], 'id': vm['id'],
                           'pvid': vms[pvm_name]['id'],
                           'vlan': bridges[br]['vlan'],
-                          'username': username}
+                          'username': env_dict['username']}
 
     print("bridge %s vms %s"% (br, br_vms))
 
@@ -273,7 +292,7 @@ outs  = '#!/bin/bash\n'                                             \
         '-m 1024M '                                                 \
         '-device e1000,netdev=mgmt '                                \
         '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
-        '-vga std &' % {'fwdp': args.base_port, 'vmimage': vm_img_path}
+        '-vga std &' % {'fwdp': args.base_port, 'vmimage': env_dict['vmimgpath']}
 
 fout.write(outs)
 
