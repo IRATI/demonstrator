@@ -5,19 +5,14 @@
 #
 
 import re
-import argparse
 import subprocess
 
 
 env_dict = {}
 
-argparser = argparse.ArgumentParser()
-argparser.add_argument('-p', '--base-port',
-                       help = "Base port for VMs",
-                       type = int, default = 2222)
+keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
 
-args = argparser.parse_args()
-
+# Parse gen.env
 fin = open('gen.env', 'r')
 while 1:
     line = fin.readline()
@@ -31,13 +26,21 @@ while 1:
     key = m.group(1)
     value = m.group(2)
 
-    if key not in ['vmimgpath', 'installpath', 'username']:
+    if key not in keywords:
         print('Unrecognized keyword %s' % (key))
         continue
 
     env_dict[key] = value
 fin.close()
 
+for key in keywords:
+    if key not in env_dict:
+        print("Configuration variables missing")
+        quit(1)
+
+env_dict['baseport'] = int(env_dict['baseport'])
+
+# Parse gen.conf
 fin = open('gen.conf', 'r')
 
 vms = dict()
@@ -112,7 +115,7 @@ for i in sorted(vms):
 
     vm['id'] = vmid
 
-    fwdp = args.base_port + vmid
+    fwdp = env_dict['baseport'] + vmid
     fwdc = fwdp + 10000
     mac = '00:0a:0a:0a:%02x:%02x' % (vmid, 99)
 
@@ -278,25 +281,4 @@ fout.write(outs)
 fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
-
-# program script
-fout = open('update_vm.sh', 'w')
-
-outs  = '#!/bin/bash\n'                                             \
-        '\n'                                                        \
-        'set -x\n'                                                  \
-        '\n'                                                        \
-        'qemu-system-x86_64 "%(vmimage)s" '                         \
-        '--enable-kvm '                                             \
-        '-smp 2 '                                                   \
-        '-m 1024M '                                                 \
-        '-device e1000,netdev=mgmt '                                \
-        '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
-        '-vga std &' % {'fwdp': args.base_port, 'vmimage': env_dict['vmimgpath']}
-
-fout.write(outs)
-
-fout.close()
-
-subprocess.call(['chmod', '+x', 'update_vm.sh'])
 
