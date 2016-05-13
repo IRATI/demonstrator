@@ -12,7 +12,6 @@ import os
 
 
 env_dict = {}
-
 keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
 
 # Parse gen.env
@@ -154,16 +153,26 @@ for i in sorted(vms):
 for i in sorted(vms):
     vm = vms[i]
 
+    generated_files = 'enroll.py shimeth.%(name)s.*.dif default.dif '   \
+                      '%(name)s.ipcm.conf' % {'name': vm['name']}
+
     outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
-            'set -x\n'\
-            'sudo hostname %(name)s\n'\
-            '\n'\
-            'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
+            '   scp -P %(ssh)s %(genfiles)s %(username)s@localhost: \n'\
+            '   DONE=$?\n'\
+            '   if [ $DONE != "0" ]; then\n'\
+            '       sleep 1\n'\
+            '   fi\n'\
+            'done\n\n'\
+            'ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
+                'set -x\n'\
+                'sudo hostname %(name)s\n'\
+                '\n'\
+                'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
-                    'username': env_dict['username']}
+                    'username': env_dict['username'],
+                    'genfiles': generated_files}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -181,12 +190,7 @@ for i in sorted(vms):
                 'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" -c /etc/template.conf -l DEBUG &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
-            'ENDSSH\n'\
-            '   DONE=$?\n'\
-            '   if [ $DONE != "0" ]; then\n'\
-            '       sleep 1\n'\
-            '   fi\n'\
-            'done\n\n' % env_dict
+            'ENDSSH\n' % env_dict
 
 
 for br in sorted(bridges):
