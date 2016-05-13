@@ -18,11 +18,15 @@ epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
 argparser = argparse.ArgumentParser(description = description,
                                     epilog = epilog)
-argparser.add_argument('--vlan', help = "VLAN name",
-                       type = int, required = True)
-argparser.add_argument('--pivot-id', help = "ID of the pivot VM",
-                       type = int, required = True)
 argparser.add_argument('--ipcm-conf', help = "Path to the IPCM configuration file",
+                       type = str, required = True)
+argparser.add_argument('--enrollee-id', help = "ID of the enrolling IPCP",
+                       type = int, required = True)
+argparser.add_argument('--dif', help = "Name of DIF to enroll to",
+                       type = str, required = True)
+argparser.add_argument('--lower-dif', help = "Name of the lower level DIF",
+                       type = int, required = True)
+argparser.add_argument('--enroller-name', help = "Name of the remote neighbor IPCP to enroll to",
                        type = str, required = True)
 args = argparser.parse_args()
 
@@ -63,7 +67,10 @@ try:
     data = s.recv(1024)
     printalo(data)
 
-    s.sendall(bytes('enroll-to-dif 4 n.DIF %s n.%s.IPCP 1\n' % (args.vlan, args.pivot_id), 'ascii'))
+    cmd = 'enroll-to-dif %s %s %s %s 1\n' \
+            % (args.enrollee_id, args.dif, args.lower_dif, args.enroller_name)
+
+    s.sendall(bytes(cmd, 'ascii'))
 
     data = s.recv(1024)
     printalo(data)

@@ -161,7 +161,7 @@ for i in sorted(vms):
 for i in sorted(vms):
     vm = vms[i]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif default.dif %(name)s.ipcm.conf ' \
+    gen_files_conf = 'shimeth.%(name)s.*.dif normal.1.dif %(name)s.ipcm.conf ' \
                         % {'name': vm['name']}
     gen_files_bin = 'enroll.py mac2ifname '
     gen_files = gen_files_conf + gen_files_bin
@@ -232,8 +232,10 @@ for br in sorted(bridges):
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
-            'sudo enroll.py --vlan %(vlan)s --pivot-id %(pvid)s '\
-                        '--ipcm-conf /etc/%(vmname)s.ipcm.conf\n'\
+            'sudo enroll.py --lower-dif %(vlan)s --dif n.DIF '\
+                        '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
+                        '--enrollee-id %(eid)s '\
+                        '--enroller-name n.1.%(pvid)s.IPCP\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -245,7 +247,8 @@ for br in sorted(bridges):
                           'pvid': vms[pvm_name]['id'],
                           'vlan': bridges[br]['vlan'],
                           'username': env_dict['username'],
-                          'vmname': vm['name']}
+                          'vmname': vm['name'],
+                          'eid': len(vm['ports']) + 1}
 
     print("bridge %s vms %s"% (br, br_vms))
 
@@ -345,7 +348,7 @@ for i in sorted(vms):
 
     ipcmconf["difConfigurations"].append({
                             "name": "n.DIF",
-                            "template": "default.DIF"
+                            "template": "normal.1.dif"
                             })
 
     # Dump the IPCM configuration files
