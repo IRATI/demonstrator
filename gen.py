@@ -11,6 +11,13 @@ import re
 import os
 
 
+# Compile mac2ifname program
+try:
+    subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
+except:
+    print('Cannot find a C compiler to compile mac2ifname program')
+    quit(1)
+
 env_dict = {}
 keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
 
