@@ -304,11 +304,11 @@ fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
 
-# Generate the IPCM configuration files
 
 for i in sorted(vms):
     vm = vms[i]
 
+    # Generate the IPCM configuration file
     ipcmconf = copy.deepcopy(gen_templates.ipcmconf_base)
 
     for port in vm['ports']:
@@ -355,4 +355,19 @@ for i in sorted(vms):
     fout.close()
 
 
-# Generate configuration files for normal DIFs
+# Generate configuration files for a normal DIF
+difconf = copy.deepcopy(gen_templates.normal_dif_base)
+
+for i in sorted(vms):
+    vm = vms[i]
+    difconf["knownIPCProcessAddresses"].append({
+                                "apName":  "n.1.%d.IPCP" % vm['id'],
+                                "apInstance": "1",
+                                "address": 16 + vm['id']
+                            })
+
+# Dump the normal DIF configuration files
+difconf_str = json.dumps(difconf, indent=4, sort_keys=True) % env_dict
+fout = open('normal.1.dif', 'w')
+fout.write(difconf_str);
+fout.close()

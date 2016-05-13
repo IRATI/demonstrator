@@ -56,25 +56,25 @@ normal_dif_base =  {
     "qosCubes" : [ {
             "name" : "unreliablewithflowcontrol",
             "id" : 1,
-            "partialDelivery" : 'false',
-            "orderedDelivery" : 'true',
+            "partialDelivery" : False,
+            "orderedDelivery" : True,
             "efcpPolicies" : {
                 "dtpPolicySet" : {
                     "name" : "default",
                     "version" : "0"
                 },
                 "initialATimer" : 300,
-                "dtcpPresent" : 'true',
+                "dtcpPresent" : True,
                 "dtcpConfiguration" : {
                     "dtcpPolicySet" : {
                         "name" : "default",
                         "version" : "0"
                     },
-                    "rtxControl" : 'false',
-                    "flowControl" : 'true',
+                    "rtxControl" : False,
+                    "flowControl" : True,
                     "flowControlConfig" : {
-                        "rateBased" : 'false',
-                        "windowBased" : 'true',
+                        "rateBased" : False,
+                        "windowBased" : True,
                         "windowBasedConfig" : {
                             "maxClosedWindowQueueLength" : 50,
                             "initialCredit" : 50
@@ -85,8 +85,8 @@ normal_dif_base =  {
         }, {
             "name" : "reliablewithflowcontrol",
             "id" : 2,
-            "partialDelivery" : 'false',
-            "orderedDelivery" : 'true',
+            "partialDelivery" : False,
+            "orderedDelivery" : True,
             "maxAllowableGap": 0,
             "efcpPolicies" : {
                 "dtpPolicySet" : {
@@ -94,21 +94,21 @@ normal_dif_base =  {
                     "version" : "0"
                 },
                 "initialATimer" : 300,
-                "dtcpPresent" : 'true',
+                "dtcpPresent" : True,
                 "dtcpConfiguration" : {
                     "dtcpPolicySet" : {
                         "name" : "default",
                         "version" : "0"
                     },
-                    "rtxControl" : 'true',
+                    "rtxControl" : True,
                     "rtxControlConfig" : {
                         "dataRxmsNmax" : 5,
                         "initialRtxTime" : 1000
                     },
-                    "flowControl" : 'true',
+                    "flowControl" : True,
                     "flowControlConfig" : {
-                        "rateBased" : 'false',
-                        "windowBased" : 'true',
+                        "rateBased" : False,
+                        "windowBased" : True,
                         "windowBasedConfig" : {
                             "maxClosedWindowQueueLength" : 50,
                             "initialCredit" : 50
