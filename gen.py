@@ -191,10 +191,12 @@ for i in sorted(vms):
                 'sudo ip link set $PORT up\n'\
                 'sudo ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
                 'sudo ip link set $PORT.%(vlan)s up\n'\
+                'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth.%(vmname)s.%(vlan)s.dif\n'\
                 'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth%(idx)s.dif\n'\
                 'sudo sed -i "s|vlan%(idx)s|%(vlan)s|g" /etc/template.conf\n'\
                     % {'mac': port['mac'], 'idx': port['idx'],
-                       'id': vm['id'], 'vlan': port['vlan']}
+                       'id': vm['id'], 'vlan': port['vlan'],
+                       'vmname': vm['name']}
 
     outs +=     'sudo modprobe shim-eth-vlan\n'\
                 'sudo modprobe normal-ipcp\n'\
