@@ -80,39 +80,6 @@ while 1:
 
 fin.close()
 
-ipcmconf = {
-            "configFileVersion": "1.4.1",
-            "localConfiguration": {
-                "installationPath": "%(installpath)s/bin",
-                "libraryPath": "%(installpath)s/lib",
-                "logPath": "%(installpath)s/var/log",
-                "consoleSocket": "%(installpath)s/var/run/ipcm-console.sock",
-                "pluginsPaths": [
-                        "%(installpath)s/lib/rinad/ipcp",
-                        "/lib/modules/4.1.10-irati/extra"
-                ]
-                },
-
-            "applicationToDIFMappings": [
-                {
-                    "encodedAppName": "rina.apps.echotime.server-1--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime.client-1--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime-2--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime.client-2--",
-                    "difName": "n.DIF"
-                }
-            ],
-        }
-
 # up script
 fout = open('up.sh', 'w')
 
@@ -316,6 +283,52 @@ fout.close()
 subprocess.call(['chmod', '+x', 'down.sh'])
 
 # Generate the IPCM configuration files
+ipcmconf = {
+            "configFileVersion": "1.4.1",
+            "localConfiguration": {
+                "installationPath": "%(installpath)s/bin",
+                "libraryPath": "%(installpath)s/lib",
+                "logPath": "%(installpath)s/var/log",
+                "consoleSocket": "%(installpath)s/var/run/ipcm-console.sock",
+                "pluginsPaths": [
+                        "%(installpath)s/lib/rinad/ipcp",
+                        "/lib/modules/4.1.10-irati/extra"
+                ]
+                },
+
+            "applicationToDIFMappings": [
+                {
+                    "encodedAppName": "rina.apps.echotime.server-1--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime.client-1--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime-2--",
+                    "difName": "n.DIF"
+                },
+                {
+                    "encodedAppName": "rina.apps.echotime.client-2--",
+                    "difName": "n.DIF"
+                }
+            ],
+
+            "ipcProcessesToCreate": [],
+        }
+
+for i in sorted(vms):
+    vm = vms[i]
+
+    for port in vm['ports']:
+        ipcmconf["ipcProcessesToCreate"].append({
+                                "apName": "eth.%d.IPCP" % port['idx'],
+                                 "apInstance": "1",
+                                 "difName": port['vlan']
+                                })
+
+# Dump the IPCM configuration files
 ipcmconfstr = json.dumps(ipcmconf, indent=4, sort_keys=True) % env_dict
 print(ipcmconfstr)
 
