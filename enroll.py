@@ -53,28 +53,34 @@ if socket_name == None:
 
 s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
+connected = False
 trials = 0
 while trials < 4:
     try:
         s.connect(socket_name)
+        connected = True
         break
     except:
         pass
     trials += 1
     time.sleep(1)
 
-try:
-    data = s.recv(1024)
-    printalo(data)
+if connected:
+    try:
+        data = s.recv(1024)
+        printalo(data)
 
-    cmd = 'enroll-to-dif %s %s %s %s 1\n' \
-            % (args.enrollee_id, args.dif, args.lower_dif, args.enroller_name)
+        cmd = 'enroll-to-dif %s %s %s %s 1\n' \
+                % (args.enrollee_id, args.dif, args.lower_dif, args.enroller_name)
 
-    s.sendall(bytes(cmd, 'ascii'))
+        s.sendall(bytes(cmd, 'ascii'))
 
-    data = s.recv(1024)
-    printalo(data)
-except:
-    pass
+        data = s.recv(1024)
+        printalo(data)
+    except:
+        pass
+
+else:
+    print('Failed to connect to "%s"' % socket_name)
 
 s.close()
