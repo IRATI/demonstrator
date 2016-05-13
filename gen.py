@@ -180,11 +180,10 @@ for i in sorted(vms):
                 '\n'\
                 'sudo mv %(genfilesconf)s /etc\n'\
                 'sudo mv %(genfilesbin)s /usr/bin\n'\
-                'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
-                    'genfilesbin': gen_files_bin}
+                    'genfilesbin': gen_files_bin, 'vmname': vm['name']}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -192,8 +191,6 @@ for i in sorted(vms):
                 'sudo ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
                 'sudo ip link set $PORT.%(vlan)s up\n'\
                 'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth.%(vmname)s.%(vlan)s.dif\n'\
-                'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth%(idx)s.dif\n'\
-                'sudo sed -i "s|vlan%(idx)s|%(vlan)s|g" /etc/template.conf\n'\
                     % {'mac': port['mac'], 'idx': port['idx'],
                        'id': vm['id'], 'vlan': port['vlan'],
                        'vmname': vm['name']}
@@ -201,10 +198,12 @@ for i in sorted(vms):
     outs +=     'sudo modprobe shim-eth-vlan\n'\
                 'sudo modprobe normal-ipcp\n'\
                 'sudo modprobe rina-default-plugin\n'\
-                'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" -c /etc/template.conf -l DEBUG &> log &\n'\
+                'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" '\
+                            '-c /etc/%(vmname)s.ipcm.conf -l DEBUG &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
-            'ENDSSH\n' % env_dict
+            'ENDSSH\n' % {'installpath': env_dict['installpath'],
+                          'vmname': vm['name']}
 
 
 for br in sorted(bridges):
