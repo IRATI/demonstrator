@@ -4,9 +4,10 @@
 # Author: Vincenzo Maffione <v.maffione@nextworks.it>
 #
 
-import re
 import subprocess
 import json
+import copy
+import re
 
 
 env_dict = {}
@@ -283,7 +284,7 @@ fout.close()
 subprocess.call(['chmod', '+x', 'down.sh'])
 
 # Generate the IPCM configuration files
-ipcmconf = {
+ipcmconf_base = {
             "configFileVersion": "1.4.1",
             "localConfiguration": {
                 "installationPath": "%(installpath)s/bin",
@@ -316,19 +317,42 @@ ipcmconf = {
             ],
 
             "ipcProcessesToCreate": [],
+            "difConfigurations": [],
         }
 
 for i in sorted(vms):
     vm = vms[i]
 
+    ipcmconf = copy.deepcopy(ipcmconf_base)
+
     for port in vm['ports']:
         ipcmconf["ipcProcessesToCreate"].append({
                                 "apName": "eth.%d.IPCP" % port['idx'],
-                                 "apInstance": "1",
-                                 "difName": port['vlan']
+                                "apInstance": "1",
+                                "difName": port['vlan']
+                                })
+        ipcmconf["difConfigurations"].append({
+                                "name": port['vlan'],
+                                "template": 'shimeth.%s.dif' % (port['vlan'])
                                 })
 
-# Dump the IPCM configuration files
-ipcmconfstr = json.dumps(ipcmconf, indent=4, sort_keys=True) % env_dict
-print(ipcmconfstr)
+    normal_ipcp = { "apName": "n.1.%d.IPCP" % vm['id'],
+                    "apInstance": "1",
+                    "difName": 'n.DIF' }
+
+    normal_ipcp["difsToRegisterAt"] = []
+    for port in vm['ports']:
+        normal_ipcp["difsToRegisterAt"].append(port['vlan'])
+    ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
+
+    ipcmconf["difConfigurations"].append({
+                            "name": "n.DIF",
+                            "template": "default.DIF"
+                            })
+
+    # Dump the IPCM configuration files
+    ipcmconf_str = json.dumps(ipcmconf, indent=4, sort_keys=True) % env_dict
+    fout = open('%s.ipcm.conf' % (vm['name'],), 'w')
+    fout.write(ipcmconf_str);
+    fout.close()
 
