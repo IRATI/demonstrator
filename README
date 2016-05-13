@@ -14,32 +14,26 @@
 
 ####### Instructions - please follow the specified order ########
 
-(1) Run ./configure script to set the IRATI installation path (on the VM
+(1) Edit the gen.env file to set the IRATI installation path (on the VM
     filesystem), the path of the QEMU VM image (on your physical machine
     file system) and the login username on the VM (${username})
 
-(2) Copy template.conf, default.dif, and shimeth*.dif in /etc/ on the VM
+(2) Specify the desired topology in gen.conf
 
-(3) Copy enroll.py to /usr/bin (or other $PATH element) on the VM
+(3) Run ./gen.py to generate bootstrap and teardown script for the
+    topology specified in (2)
 
-(4) Compile mac2ifname.c into mac2ifname and copy the later to /usr/bin
-    (or other $PATH element) on the VM
+(4) Use ./up.sh to bootstrap the scenario
 
-(5) Specify the desired topology in gen.conf
-
-(6) Run ./gen.py
-
-(7) Use ./up.sh to bootstrap the scenario
-
-(8) VMs are accessible at localhost ports 2223, 2224, 2225, etc.
+(5) VMs are accessible at localhost ports 2223, 2224, 2225, etc.
 	e.g. ssh -p2223 ${username}@localhost
 
-(9) Perform your tests on the VMs using ssh (8)
+(6) Perform your tests on the VMs using ssh (5)
 
-(10) Shutdown the scenario (destroying the VMs) using ./down.sh
+(7) Shutdown the scenario (destroying the VMs) using ./down.sh
 
-(11) VMs launched by ./up.sh have a non-persistent disk --> modifications
-     will be lost at shutdown time (10).
+(8) VMs launched by ./up.sh have a non-persistent disk --> modifications
+     will be lost at shutdown time (7).
      To make persistent modifications to the VM image (e.g. to update PRISTINE
      software), run ./update_vm.sh and access the VM at
           ssh -p2222 ${username}@localhost
@@ -61,18 +55,6 @@ and again (during the tests):
 [http://serverfault.com/questions/241588/how-to-automate-ssh-login-with-password]
 
 Now you should be able to run ./up.sh without the need to insert the password
-
-
-####### Other notes #######
-
-If you happen to see in the logs errors referencing "vlanX" names,
-similar to the following:
-
-    rina-shim-eth-vlan(ERR): Error converting DIF Name to VLAN ID: vlan3
-    rina-kipcm(ERR): Assign to dif vlan3/// operation failed for IPC process 3
-
-don't worry, it is not a real error. We are working on improving the generated configuration
-file, in order avoid this to show up.
 
 
 Vincenzo
