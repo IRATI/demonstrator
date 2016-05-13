@@ -8,6 +8,7 @@ import subprocess
 import json
 import copy
 import re
+import os
 
 
 env_dict = {}
@@ -331,10 +332,22 @@ for i in sorted(vms):
                                 "apInstance": "1",
                                 "difName": port['vlan']
                                 })
+
+        template_file_name = 'shimeth.%s.%s.dif' % (vm['name'], port['vlan'])
         ipcmconf["difConfigurations"].append({
                                 "name": port['vlan'],
-                                "template": 'shimeth.%s.dif' % (port['vlan'])
+                                "template": template_file_name
                                 })
+
+        fout = open(template_file_name, 'w')
+        fout.write(json.dumps({"difType": "shim-eth-vlan",
+                               "configParameters": {
+                                    "interface-name": "ifc%d" % (port['idx'],)
+                                    }
+                              },
+                              indent=4, sort_keys=True))
+        fout.close()
+
 
     normal_ipcp = { "apName": "n.1.%d.IPCP" % vm['id'],
                     "apInstance": "1",
