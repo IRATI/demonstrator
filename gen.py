@@ -160,8 +160,10 @@ for i in sorted(vms):
 for i in sorted(vms):
     vm = vms[i]
 
-    generated_files = 'enroll.py shimeth.%(name)s.*.dif default.dif '   \
-                      '%(name)s.ipcm.conf mac2ifname' % {'name': vm['name']}
+    gen_files_conf = 'shimeth.%(name)s.*.dif default.dif %(name)s.ipcm.conf ' \
+                        % {'name': vm['name']}
+    gen_files_bin = 'enroll.py mac2ifname '
+    gen_files = gen_files_conf + gen_files_bin
 
     outs += ''\
             'DONE=255\n'\
@@ -176,10 +178,13 @@ for i in sorted(vms):
                 'set -x\n'\
                 'sudo hostname %(name)s\n'\
                 '\n'\
+                'sudo mv %(genfilesconf)s /etc\n'\
+                'sudo mv %(genfilesbin)s /usr/bin\n'\
                 'sudo sed -i "s|vmid|%(id)s|g" /etc/template.conf\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
-                    'genfiles': generated_files}
+                    'genfiles': gen_files, 'genfilesconf': gen_files_conf,
+                    'genfilesbin': gen_files_bin}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
