@@ -232,7 +232,8 @@ for br in sorted(bridges):
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
-            'sudo enroll.py %(vlan)s %(pvid)s\n'\
+            'sudo enroll.py --vlan %(vlan)s --pivot-id %(pvid)s '\
+                        '--ipcm-conf /etc/%(vmname)s.ipcm.conf\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -243,7 +244,8 @@ for br in sorted(bridges):
             'done\n\n' % {'ssh': vm['ssh'], 'id': vm['id'],
                           'pvid': vms[pvm_name]['id'],
                           'vlan': bridges[br]['vlan'],
-                          'username': env_dict['username']}
+                          'username': env_dict['username'],
+                          'vmname': vm['name']}
 
     print("bridge %s vms %s"% (br, br_vms))
 

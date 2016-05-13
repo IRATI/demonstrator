@@ -4,8 +4,8 @@
 # Author: Vincenzo Maffione <v.maffione@nextworks.it>
 #
 
+import argparse
 import socket
-import sys
 import time
 import re
 
@@ -13,15 +13,25 @@ def printalo(byt):
     print(repr(byt).replace('\\n', '\n'))
 
 
-vlan = sys.argv[1]
-pvid = sys.argv[2]
+description = "Python script to enroll IPCPs"
+epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
+
+argparser = argparse.ArgumentParser(description = description,
+                                    epilog = epilog)
+argparser.add_argument('--vlan', help = "VLAN name",
+                       type = int, required = True)
+argparser.add_argument('--pivot-id', help = "ID of the pivot VM",
+                       type = int, required = True)
+argparser.add_argument('--ipcm-conf', help = "Path to the IPCM configuration file",
+                       type = str, required = True)
+args = argparser.parse_args()
 
 HOST = '127.0.0.1'    # The remote host
 PORT = 32766          # The same port as used by the server
 
 socket_name = None
 
-fin = open('/etc/template.conf', 'r')
+fin = open(args.ipcm_conf, 'r')
 while 1:
     line = fin.readline()
     if line == '':
@@ -53,7 +63,7 @@ try:
     data = s.recv(1024)
     printalo(data)
 
-    s.sendall(bytes('enroll-to-dif 4 n.DIF %s n.%s.IPCP 1\n' % (vlan, pvid), 'ascii'))
+    s.sendall(bytes('enroll-to-dif 4 n.DIF %s n.%s.IPCP 1\n' % (args.vlan, args.pivot_id), 'ascii'))
 
     data = s.recv(1024)
     printalo(data)
