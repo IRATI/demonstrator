@@ -30,9 +30,6 @@ argparser.add_argument('--enroller-name', help = "Name of the remote neighbor IP
                        type = str, required = True)
 args = argparser.parse_args()
 
-HOST = '127.0.0.1'    # The remote host
-PORT = 32766          # The same port as used by the server
-
 socket_name = None
 
 fin = open(args.ipcm_conf, 'r')
@@ -43,7 +40,7 @@ while 1:
 
     m = re.search(r'"(\S+ipcm-console.sock)', line)
     if m != None:
-        socket_name = m.groups(1)
+        socket_name = m.group(1)
         break
 fin.close()
 
