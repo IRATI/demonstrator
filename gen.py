@@ -161,7 +161,7 @@ for i in sorted(vms):
     vm = vms[i]
 
     generated_files = 'enroll.py shimeth.%(name)s.*.dif default.dif '   \
-                      '%(name)s.ipcm.conf' % {'name': vm['name']}
+                      '%(name)s.ipcm.conf mac2ifname' % {'name': vm['name']}
 
     outs += ''\
             'DONE=255\n'\
