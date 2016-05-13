@@ -44,10 +44,10 @@ get_mac_by_ifname(const char *ifname, uint8_t *hwaddr)
 int main(int argc, char *argv[])
 {
     struct ifaddrs *ifaddr, *ifa;
-    int family, s, n;
-    char host[NI_MAXHOST];
+    unsigned int scanfbuf[6];
     uint8_t mac_addr_one[6];
     uint8_t mac_addr_two[6];
+    int n;
 
     if (argc < 2) {
         printf("    usage: mac2ifname MAC_ADDRESS\n");
@@ -55,15 +55,19 @@ int main(int argc, char *argv[])
     }
 
     n = sscanf(argv[1], "%x:%x:%x:%x:%x:%x",
-                &mac_addr_one[0],
-                &mac_addr_one[1],
-                &mac_addr_one[2],
-                &mac_addr_one[3],
-                &mac_addr_one[4],
-                &mac_addr_one[5]);
+                &scanfbuf[0],
+                &scanfbuf[1],
+                &scanfbuf[2],
+                &scanfbuf[3],
+                &scanfbuf[4],
+                &scanfbuf[5]);
     if (n != 6) {
         printf("    invalid MAC address %s\n", argv[1]);
         return -1;
+    }
+
+    for (n = 0; n < 6; n++) {
+        mac_addr_one[n] = (uint8_t)scanfbuf[n];
     }
 
     if (getifaddrs(&ifaddr) == -1) {
