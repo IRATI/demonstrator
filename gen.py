@@ -12,7 +12,7 @@ import re
 import os
 
 
-# Compile mac2ifname program
+######################## Compile mac2ifname program ########################
 try:
     subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
 except:
@@ -22,7 +22,8 @@ except:
 env_dict = {}
 keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
 
-# Parse gen.env
+
+############################## Parse gen.env ###############################
 fin = open('gen.env', 'r')
 while 1:
     line = fin.readline()
@@ -50,7 +51,8 @@ for key in keywords:
 
 env_dict['baseport'] = int(env_dict['baseport'])
 
-# Parse gen.conf
+
+############################# Parse gen.conf ##############################
 fin = open('gen.conf', 'r')
 
 vms = dict()
@@ -337,12 +339,11 @@ fout.close()
 subprocess.call(['chmod', '+x', 'down.sh'])
 
 
-# Generate the IPCM configuration files
+################## Generate IPCM/DIF configuration files ##################
 ipcmconfs = dict()
 for vmname in sorted(vms):
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
 
-# Generate configuration files for a normal DIF
 difconfs = dict()
 for dif in sorted(difs):
     difconfs[dif] = copy.deepcopy(gen_templates.normal_dif_base)
