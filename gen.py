@@ -67,24 +67,23 @@ while 1:
     if line.startswith('#'):
         continue
 
-    m = re.match(r'\s*vm\s+(\w+)', line)
-    if m:
-        name = m.group(1)
-        vms[name] = {'name': name, 'ports': []}
-        continue
-
-    m = re.match(r'\s*bridge\s+(\w+)\s+(\d+)', line)
-    if m:
-        name = m.group(1)
-        vlan = m.group(2)
-        bridges[name] = {'name': name, 'vlan': vlan}
-        continue
-
-    m = re.match(r'\s*link\s+(\w+)\s+(\w+)', line)
+    m = re.match(r'\s*eth\s+(\w+)\s+(\d+)\s+(\w.*)$', line)
     if m:
         bridge = m.group(1)
-        vm = m.group(2)
-        links.append((bridge, vm))
+        vlan = m.group(2)
+        vm_list = m.group(3).split()
+
+        for vm in vm_list:
+            if vm not in vms:
+                vms[vm] = {'name': vm, 'ports': []}
+            links.append((bridge, vm))
+
+        if bridge not in bridges:
+            bridges[bridge] = {'name': bridge, 'vlan': vlan}
+
+        #for i in range(len(vm_list)-1):
+        #    for j in range(i + 1, len(vm_list)):
+        #        print(vm_list[i], vm_list[j])
         continue
 
 fin.close()
