@@ -72,6 +72,7 @@ bridges = dict()
 links = []
 difs = dict()
 enrollments = dict()
+difsdeps = dict()
 
 linecnt = 0
 
@@ -131,6 +132,15 @@ while 1:
         continue
 
 fin.close()
+
+
+################ Compute DIFs dependency graph ##################
+for dif in difs:
+    difsdeps[dif] = []
+    for vmname in difs[dif]:
+        for lower_dif in difs[dif][vmname]:
+            if lower_dif not in difsdeps[dif]:
+                difsdeps[dif].append(lower_dif)
 
 
 ####################### Compute DIF graphs #######################
