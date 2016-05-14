@@ -167,7 +167,6 @@ for dif in difs:
     #print(neighsets)
     #print(graph)
 
-print(enrollments)
 
 ###################### Generate UP script ########################
 fout = open('up.sh', 'w')
@@ -287,35 +286,25 @@ for vmname in sorted(vms):
                           'vmname': vm['name']}
 
 
-for br in sorted(bridges):
-    br_vms = []
-    for l in links:
-        b, vm = l
-        if b == br:
-            br_vms.append(vm)
+for dif in difs:
+    for enrollment in enrollments[dif]:
+        vm = vms[enrollment['enrollee']]
 
-    if len(br_vms) < 2:
-        continue
+        print('Enrolling %s to DIF %s against neighbor %s, thorugh '\
+                'lower DIF %s' % (enrollment['enrollee'], dif,
+                                  enrollment['enroller'],
+                                  enrollment['lower_dif']))
 
-    pvm_name = br_vms[0]
-
-    outs += 'sleep 2\n' # important!!
-
-    for vm_name in sorted(br_vms):
-        if vm_name == pvm_name:
-            continue
-
-        vm = vms[vm_name]
-
+        outs += 'sleep 2\n' # important!!
         outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
-            'sudo enroll.py --lower-dif %(vlan)s --dif n1.DIF '\
+            'sudo enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
                         '--enrollee-id %(eid)s '\
-                        '--enroller-name n1.%(pvid)s.IPCP\n'\
+                        '--enroller-name %(dif)s.%(pvid)s.IPCP\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -324,13 +313,11 @@ for br in sorted(bridges):
             '       sleep 1\n'\
             '   fi\n'\
             'done\n\n' % {'ssh': vm['ssh'], 'id': vm['id'],
-                          'pvid': vms[pvm_name]['id'],
-                          'vlan': bridges[br]['vlan'],
+                          'pvid': vms[enrollment['enroller']]['id'],
                           'username': env_dict['username'],
                           'vmname': vm['name'],
-                          'eid': len(vm['ports']) + 1}
-
-    print("bridge %s vms %s"% (br, br_vms))
+                          'eid': len(vm['ports']) + 1,
+                          'dif': dif, 'ldif': enrollment['lower_dif']}
 
 fout.write(outs)
 
