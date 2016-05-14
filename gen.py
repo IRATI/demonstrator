@@ -6,10 +6,22 @@
 
 import gen_templates
 import subprocess
+import argparse
 import json
 import copy
 import re
 import os
+
+
+description = "Python script to generate IRATI deployments for Virtual Machines"
+epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
+
+argparser = argparse.ArgumentParser(description = description,
+                                    epilog = epilog)
+argparser.add_argument('-c', '--conf',
+                       help = "gen.conf configuration file", type = str,
+                       default = 'gen.conf')
+args = argparser.parse_args()
 
 
 ######################## Compile mac2ifname program ########################
@@ -53,7 +65,7 @@ env_dict['baseport'] = int(env_dict['baseport'])
 
 
 ############################# Parse gen.conf ##############################
-fin = open('gen.conf', 'r')
+fin = open(args.conf, 'r')
 
 vms = dict()
 bridges = dict()
