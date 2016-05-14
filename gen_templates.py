@@ -15,19 +15,19 @@ ipcmconf_base = {
             "applicationToDIFMappings": [
                 {
                     "encodedAppName": "rina.apps.echotime.server-1--",
-                    "difName": "n.DIF"
+                    "difName": "n1.DIF"
                 },
                 {
                     "encodedAppName": "rina.apps.echotime.client-1--",
-                    "difName": "n.DIF"
+                    "difName": "n1.DIF"
                 },
                 {
                     "encodedAppName": "rina.apps.echotime-2--",
-                    "difName": "n.DIF"
+                    "difName": "n1.DIF"
                 },
                 {
                     "encodedAppName": "rina.apps.echotime.client-2--",
-                    "difName": "n.DIF"
+                    "difName": "n1.DIF"
                 }
             ],
 

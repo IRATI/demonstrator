@@ -118,7 +118,7 @@ while 1:
 fin.close()
 
 
-# up script
+###################### Generate UP script ########################
 fout = open('up.sh', 'w')
 
 outs =  '#!/bin/bash\n'             \
@@ -190,7 +190,7 @@ for vmname in sorted(vms):
 for vmname in sorted(vms):
     vm = vms[vmname]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif normal.1.dif %(name)s.ipcm.conf ' \
+    gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif %(name)s.ipcm.conf ' \
                         % {'name': vm['name']}
     gen_files_bin = 'enroll.py mac2ifname '
     gen_files = gen_files_conf + gen_files_bin
@@ -261,10 +261,10 @@ for br in sorted(bridges):
             'while [ $DONE != "0" ]; do\n'\
             '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
-            'sudo enroll.py --lower-dif %(vlan)s --dif n.DIF '\
+            'sudo enroll.py --lower-dif %(vlan)s --dif n1.DIF '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
                         '--enrollee-id %(eid)s '\
-                        '--enroller-name n.1.%(pvid)s.IPCP\n'\
+                        '--enroller-name n1.%(pvid)s.IPCP\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -288,7 +288,7 @@ fout.close()
 subprocess.call(['chmod', '+x', 'up.sh'])
 
 
-# down script
+###################### Generate DOWN script ########################
 fout = open('down.sh', 'w')
 
 outs =  '#!/bin/bash\n'             \
@@ -336,14 +336,19 @@ fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
 
+
 # Generate the IPCM configuration files
 ipcmconfs = dict()
-for vm in sorted(vms):
-    ipcmconfs[vm] = copy.deepcopy(gen_templates.ipcmconf_base)
+for vmname in sorted(vms):
+    ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
+
+# Generate configuration files for a normal DIF
+difconfs = dict()
+for dif in sorted(difs):
+    difconfs[dif] = copy.deepcopy(gen_templates.normal_dif_base)
 
 for vmname in sorted(vms):
     vm = vms[vmname]
-
     ipcmconf = ipcmconfs[vmname]
 
     for port in vm['ports']:
@@ -369,47 +374,46 @@ for vmname in sorted(vms):
         fout.close()
 
 
-    normal_ipcp = { "apName": "n.1.%d.IPCP" % vm['id'],
-                    "apInstance": "1",
-                    "difName": 'n.DIF' }
+for dif in sorted(difs):
+    difconf = difconfs[dif]
 
-    normal_ipcp["difsToRegisterAt"] = []
-    for port in vm['ports']:
-        normal_ipcp["difsToRegisterAt"].append(port['vlan'])
-    ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
+    for vmname in sorted(difs[dif]):
+        vm = vms[vmname]
+        ipcmconf = ipcmconfs[vmname]
 
-    ipcmconf["difConfigurations"].append({
-                            "name": "n.DIF",
-                            "template": "normal.1.dif"
-                            })
+        normal_ipcp = { "apName": "%s.%d.IPCP" % (dif, vm['id']),
+                        "apInstance": "1",
+                        "difName": "%s.DIF" % (dif,) }
+
+        normal_ipcp["difsToRegisterAt"] = []
+        for port in vm['ports']:
+            normal_ipcp["difsToRegisterAt"].append(port['vlan'])
+        ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
+
+        ipcmconf["difConfigurations"].append({
+                                "name": "%s.DIF" % (dif,),
+                                "template": "normal.%s.dif" % (dif,)
+                                })
+
+        difconf["knownIPCProcessAddresses"].append({
+                                    "apName":  "%s.%d.IPCP" % (dif, vm['id']),
+                                    "apInstance": "1",
+                                    "address": 16 + vm['id']
+                                })
 
 
 for vmname in sorted(vms):
     # Dump the IPCM configuration files
-    ipcmconf_str = json.dumps(ipcmconfs[vmname], indent=4, sort_keys=True) % env_dict
-    fout = open('%s.ipcm.conf' % (vm['name'],), 'w')
+    ipcmconf_str = json.dumps(ipcmconfs[vmname], indent = 4,
+                              sort_keys = True) % env_dict
+    fout = open('%s.ipcm.conf' % (vmname,), 'w')
     fout.write(ipcmconf_str);
     fout.close()
 
-
 for dif in sorted(difs):
-    for vm in sorted(difs[dif]):
-        pass
+    # Dump the normal DIF configuration files
+    difconf_str = json.dumps(difconf, indent = 4, sort_keys = True) % env_dict
+    fout = open('normal.%s.dif' % (dif,), 'w')
+    fout.write(difconf_str);
+    fout.close()
 
-
-# Generate configuration files for a normal DIF
-difconf = copy.deepcopy(gen_templates.normal_dif_base)
-
-for vmname in sorted(vms):
-    vm = vms[vmname]
-    difconf["knownIPCProcessAddresses"].append({
-                                "apName":  "n.1.%d.IPCP" % vm['id'],
-                                "apInstance": "1",
-                                "address": 16 + vm['id']
-                            })
-
-# Dump the normal DIF configuration files
-difconf_str = json.dumps(difconf, indent=4, sort_keys=True) % env_dict
-fout = open('normal.1.dif', 'w')
-fout.write(difconf_str);
-fout.close()
