@@ -55,12 +55,16 @@ fin = open('gen.conf', 'r')
 
 vms = dict()
 bridges = dict()
+difs = dict()
 links = []
+
+linecnt = 0
 
 while 1:
     line = fin.readline()
     if line == '':
         break
+    linecnt += 1
 
     line = line.replace('\n', '')
 
@@ -73,20 +77,46 @@ while 1:
         vlan = m.group(2)
         vm_list = m.group(3).split()
 
+        if bridge in bridges:
+            print('Error: Line %d: bridge %s already defined' \
+                                            % (linecnt, bridge))
+            continue
+
+        bridges[bridge] = {'name': bridge, 'vlan': vlan}
+
         for vm in vm_list:
             if vm not in vms:
                 vms[vm] = {'name': vm, 'ports': []}
             links.append((bridge, vm))
-
-        if bridge not in bridges:
-            bridges[bridge] = {'name': bridge, 'vlan': vlan}
 
         #for i in range(len(vm_list)-1):
         #    for j in range(i + 1, len(vm_list)):
         #        print(vm_list[i], vm_list[j])
         continue
 
+    m = re.match(r'\s*dif\s+(\w+)\s+(\w+)\s+(\w.*)$', line)
+    if m:
+        dif = m.group(1)
+        vm = m.group(2)
+        dif_list = m.group(3).split()
+
+        if vm not in vms:
+            vms[vm] = {'name': vm, 'ports': []}
+
+        if dif not in difs:
+            difs[dif] = dict()
+
+        if vm in difs[dif]:
+            print('Error: Line %d: vm %s in dif %s already specified' \
+                                            % (linecnt, vm, dif))
+            continue
+
+        difs[dif][vm] = dif_list
+
+        continue
+
 fin.close()
+
 
 # up script
 fout = open('up.sh', 'w')
