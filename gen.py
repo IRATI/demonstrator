@@ -57,8 +57,9 @@ fin = open('gen.conf', 'r')
 
 vms = dict()
 bridges = dict()
-difs = dict()
 links = []
+difs = dict()
+enrollments = dict()
 
 linecnt = 0
 
@@ -152,19 +153,21 @@ for dif in difs:
     # using breadth-first trasversal.
     enrolled = set([first])
     frontier = set([first])
-    enrollments = []
+    enrollments[dif] = []
     while len(frontier):
         cur = frontier.pop()
         for edge in graph[cur]:
             if edge[0] not in enrolled:
                 enrolled.add(edge[0])
-                enrollments.append((edge[0], cur, edge[1]))
+                enrollments[dif].append({'enrollee': edge[0],
+                                         'enroller': cur,
+                                         'lower_dif': edge[1]})
                 frontier.add(edge[0])
 
-    print(neighsets)
-    print(graph)
-    print(enrollments)
+    #print(neighsets)
+    #print(graph)
 
+print(enrollments)
 
 ###################### Generate UP script ########################
 fout = open('up.sh', 'w')
