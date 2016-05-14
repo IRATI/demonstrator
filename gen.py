@@ -148,8 +148,8 @@ for l in sorted(links):
 
 vmid = 1
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
 
     vm['id'] = vmid
 
@@ -187,8 +187,8 @@ for i in sorted(vms):
 
     vmid += 1
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
 
     gen_files_conf = 'shimeth.%(name)s.*.dif normal.1.dif %(name)s.ipcm.conf ' \
                         % {'name': vm['name']}
@@ -308,14 +308,14 @@ outs =  '#!/bin/bash\n'             \
         '   rm $PIDFILE\n'                                      \
         '}\n\n'
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
     outs += 'kill_qemu rina-%(id)s.pid\n' % {'id': vm['id']}
 
 outs += '\n'
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
     for port in vm['ports']:
         tap = port['tap']
         b = port['br']
@@ -336,12 +336,15 @@ fout.close()
 
 subprocess.call(['chmod', '+x', 'down.sh'])
 
+# Generate the IPCM configuration files
+ipcmconfs = dict()
+for vm in sorted(vms):
+    ipcmconfs[vm] = copy.deepcopy(gen_templates.ipcmconf_base)
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
 
-    # Generate the IPCM configuration file
-    ipcmconf = copy.deepcopy(gen_templates.ipcmconf_base)
+    ipcmconf = ipcmconfs[vmname]
 
     for port in vm['ports']:
         ipcmconf["ipcProcessesToCreate"].append({
@@ -380,18 +383,25 @@ for i in sorted(vms):
                             "template": "normal.1.dif"
                             })
 
+
+for vmname in sorted(vms):
     # Dump the IPCM configuration files
-    ipcmconf_str = json.dumps(ipcmconf, indent=4, sort_keys=True) % env_dict
+    ipcmconf_str = json.dumps(ipcmconfs[vmname], indent=4, sort_keys=True) % env_dict
     fout = open('%s.ipcm.conf' % (vm['name'],), 'w')
     fout.write(ipcmconf_str);
     fout.close()
 
 
+for dif in sorted(difs):
+    for vm in sorted(difs[dif]):
+        pass
+
+
 # Generate configuration files for a normal DIF
 difconf = copy.deepcopy(gen_templates.normal_dif_base)
 
-for i in sorted(vms):
-    vm = vms[i]
+for vmname in sorted(vms):
+    vm = vms[vmname]
     difconf["knownIPCProcessAddresses"].append({
                                 "apName":  "n.1.%d.IPCP" % vm['id'],
                                 "apInstance": "1",
