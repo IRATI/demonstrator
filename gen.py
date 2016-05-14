@@ -120,6 +120,52 @@ while 1:
 fin.close()
 
 
+####################### Compute DIF graphs #######################
+for dif in difs:
+    neighsets = dict()
+    graph = dict()
+    first = None
+
+    # For each N-1-DIF supporting this DIF, compute the set of nodes that
+    # share such N-1-DIF. This set will be called the 'neighset' of
+    # the N-1-DIF for the current DIF.
+
+    for vmname in difs[dif]:
+        graph[vmname] = [] # init for later use
+        if first == None: # pick any node for later use
+            first = vmname
+        first = vmname
+        for lower_dif in difs[dif][vmname]:
+            if lower_dif not in neighsets:
+                neighsets[lower_dif] = []
+            neighsets[lower_dif].append(vmname)
+
+    # Build the graph, represented as adjacency list
+    for lower_dif in neighsets:
+        # Each neighset corresponds to a complete (sub)graph.
+        for vm1 in neighsets[lower_dif]:
+            for vm2 in neighsets[lower_dif]:
+                if vm1 != vm2:
+                    graph[vm1].append((vm2, lower_dif))
+
+    # To generate the list of enrollments, we simulate one,
+    # using breadth-first trasversal.
+    enrolled = set([first])
+    frontier = set([first])
+    enrollments = []
+    while len(frontier):
+        cur = frontier.pop()
+        for edge in graph[cur]:
+            if edge[0] not in enrolled:
+                enrolled.add(edge[0])
+                enrollments.append((edge[0], cur, edge[1]))
+                frontier.add(edge[0])
+
+    print(neighsets)
+    print(graph)
+    print(enrollments)
+
+
 ###################### Generate UP script ########################
 fout = open('up.sh', 'w')
 
