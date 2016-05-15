@@ -177,6 +177,14 @@ while len(frontier):
             frontier.add(nxt)
     difsdeps_adj[cur] = set()
 
+circular_set = [dif for dif in difsdeps_inc_cnt if difsdeps_inc_cnt[dif] != 0]
+if len(circular_set):
+    print("Fatal error: The specified DIFs topology has one or more"\
+          "circular dependencies, involving the following"\
+          " DIFs: %s" % circular_set)
+    print("             DIFs dependency graph: %s" % difsdeps_adj);
+    quit(1)
+
 
 ####################### Compute DIF graphs #######################
 for dif in difs:
