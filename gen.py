@@ -72,7 +72,6 @@ bridges = dict()
 links = []
 difs = dict()
 enrollments = dict()
-difsdeps = dict()
 
 linecnt = 0
 
@@ -134,13 +133,52 @@ while 1:
 fin.close()
 
 
-################ Compute DIFs dependency graph ##################
+################ Compute enrollment order for DIFs ##################
+
+# Compute DIFs dependency graph, as both adjacency and incidence list.
+difsdeps_adj = dict()
+difsdeps_inc = dict()
 for dif in difs:
-    difsdeps[dif] = []
+    difsdeps_inc[dif] = set()
+    difsdeps_adj[dif] = set()
+for bridge in bridges:
+    difsdeps_inc[bridges[bridge]['vlan']] = set()
+    difsdeps_adj[bridges[bridge]['vlan']] = set()
+
+for dif in difs:
     for vmname in difs[dif]:
         for lower_dif in difs[dif][vmname]:
-            if lower_dif not in difsdeps[dif]:
-                difsdeps[dif].append(lower_dif)
+            difsdeps_inc[dif].add(lower_dif)
+            difsdeps_adj[lower_dif].add(dif)
+
+# Kahn's algorithm below only needs per-node count of
+# incident edges, so we compute these counts from the
+# incidence list and drop the latter.
+difsdeps_inc_cnt = dict()
+for dif in difsdeps_inc:
+    difsdeps_inc_cnt[dif] = len(difsdeps_inc[dif])
+del difsdeps_inc
+
+#print(difsdeps_adj)
+#print(difsdeps_inc_inc)
+
+# Run Kahn's algorithm to compute topological ordering on the DIFs graph.
+frontier = set()
+dif_ordering = []
+for dif in difsdeps_inc_cnt:
+    if difsdeps_inc_cnt[dif] == 0:
+        frontier.add(dif)
+
+while len(frontier):
+    cur = frontier.pop()
+    dif_ordering.append(cur)
+    for nxt in difsdeps_adj[cur]:
+        difsdeps_inc_cnt[nxt] -= 1
+        if difsdeps_inc_cnt[nxt] == 0:
+            frontier.add(nxt)
+    difsdeps_adj[cur] = set()
+
+print(dif_ordering)
 
 
 ####################### Compute DIF graphs #######################
