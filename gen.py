@@ -539,7 +539,6 @@ for dif in difs:
                                 })
 
     for policy in dif_policies[dif]:
-        print(policy)
         gen_templates.translate_policy(difconf, policy['path'], policy['ps'])
 
 

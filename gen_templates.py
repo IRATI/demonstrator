@@ -224,18 +224,18 @@ normal_dif_base =  {
     }
 }
 
-def dict_set(d, k, v):
-    d[k] = v
+def ps_set(d, k, v):
+    d[k]["name"] = v
 
 policy_translator = {
-    'rmt.pff': lambda d, v: dict_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v),
-    'rmt': lambda d, v: dict_set(d["rmtConfiguration"], "policySet", v),
-    'enrollment-task': lambda d, v: dict_set(d["enrollmentTaskConfiguration"], "policySet", v),
-    'flow-allocator': lambda d, v: dict_set(d["flowAllocatorConfiguration"], "policySet", v),
-    'namespace-manager': lambda d, v: dict_set(d["namespaceManagerConfiguration"], "policySet", v),
-    'security-manager': lambda d, v: dict_set(d["securityManagerConfiguration"], "policySet", v),
-    'routing': lambda d, v: dict_set(d["routingConfiguration"], "policySet", v),
-    'resource-allocator.pduftg': lambda d, v: dict_set(d["resourceAllocatorConfiguration"], "policySet", v),
+    'rmt.pff': lambda d, v: ps_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v),
+    'rmt': lambda d, v: ps_set(d["rmtConfiguration"], "policySet", v),
+    'enrollment-task': lambda d, v: ps_set(d["enrollmentTaskConfiguration"], "policySet", v),
+    'flow-allocator': lambda d, v: ps_set(d["flowAllocatorConfiguration"], "policySet", v),
+    'namespace-manager': lambda d, v: ps_set(d["namespaceManagerConfiguration"], "policySet", v),
+    'security-manager': lambda d, v: ps_set(d["securityManagerConfiguration"], "policySet", v),
+    'routing': lambda d, v: ps_set(d["routingConfiguration"], "policySet", v),
+    'resource-allocator.pduftg': lambda d, v: ps_set(d["resourceAllocatorConfiguration"], "policySet", v),
 }
 
 def translate_policy(difconf, path, ps):
