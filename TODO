@@ -1,2 +1,4 @@
 - enroll.py: use the console to get the id of an IPC process
   by name
+
+- gen.py: check that brctl and qemu-system-x86_64 is available
