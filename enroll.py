@@ -35,7 +35,7 @@ argparser.add_argument('--enrollee-name', help = "Name of the enrolling IPCP",
 argparser.add_argument('--dif', help = "Name of DIF to enroll to",
                        type = str, required = True)
 argparser.add_argument('--lower-dif', help = "Name of the lower level DIF",
-                       type = int, required = True)
+                       type = str, required = True)
 argparser.add_argument('--enroller-name', help = "Name of the remote neighbor IPCP to enroll to",
                        type = str, required = True)
 args = argparser.parse_args()
