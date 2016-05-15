@@ -530,8 +530,8 @@ for dif in difs:
                         "difName": "%s.DIF" % (dif,) }
 
         normal_ipcp["difsToRegisterAt"] = []
-        for port in vm['ports']:
-            normal_ipcp["difsToRegisterAt"].append(port['vlan'])
+        for lower_dif in difs[dif][vmname]:
+            normal_ipcp["difsToRegisterAt"].append(lower_dif)
         ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
 
         ipcmconf["difConfigurations"].append({
