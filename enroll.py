@@ -82,12 +82,13 @@ if connected:
         s.sendall(bytes(cmd, 'ascii'))
 
         # Get the list of IPCPs and parse it to look for the enroller ID
+        print('Looking up identifier for IPCP %s' % args.enrollee_name)
         lines = get_response(s)
         print(lines)
         enrollee_id = None
         for line in lines:
-            rs = r'^\s*(\d+)\s*|\s*' + args.enrollee_name
-            m = re.search(rs, line)
+            rs = r'^\s*(\d+)\s*|\s*' + args.enrollee_name.replace('.', '\\.')
+            m = re.match(rs, line)
             if m != None:
                 enrollee_id = m.group(1)
 
