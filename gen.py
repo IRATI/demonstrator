@@ -13,6 +13,14 @@ import re
 import os
 
 
+def which(program):
+    retcode = subprocess.call(['which', program], stderr = subprocess.DEVNULL,
+                              stdout = subprocess.DEVNULL)
+    if retcode != 0:
+        print('Fatal error: Cannot find "%s" program' % program)
+        quit(1)
+
+
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -22,6 +30,10 @@ argparser.add_argument('-c', '--conf',
                        help = "gen.conf configuration file", type = str,
                        default = 'gen.conf')
 args = argparser.parse_args()
+
+
+which('brctl')
+which('qemu-system-x86_64')
 
 
 ######################## Compile mac2ifname program ########################
