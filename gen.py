@@ -152,12 +152,14 @@ while 1:
             dif_policies[dif] = []
 
         dif_policies[dif].append({'path': path, 'ps': ps})
+        if path not in gen_templates.policy_translator:
+            print('Unknown component path "%s"' % path)
+            quit(1)
 
         continue
 
 fin.close()
 
-print(dif_policies)
 
 ################ Compute enrollment order for DIFs ##################
 
@@ -506,7 +508,7 @@ for vmname in sorted(vms):
         fout.close()
 
 
-for dif in sorted(difs):
+for dif in difs:
     difconf = difconfs[dif]
 
     for vmname in sorted(difs[dif]):
@@ -532,6 +534,10 @@ for dif in sorted(difs):
                                     "apInstance": "1",
                                     "address": 16 + vm['id']
                                 })
+
+    for policy in dif_policies[dif]:
+        print(policy)
+        gen_templates.policy_translator[policy['path']](difconf, policy['ps'])
 
 
 for vmname in sorted(vms):

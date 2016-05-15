@@ -224,3 +224,10 @@ normal_dif_base =  {
     }
 }
 
+def dict_set(d, k, v):
+    d[k] = v
+
+policy_translator = {
+    'rmt.pff': lambda d, v: dict_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v),
+    'rmt': lambda d, v: dict_set(d["rmtConfiguration"], "policySet", v),
+}
