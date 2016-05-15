@@ -87,7 +87,7 @@ if connected:
         print(lines)
         enrollee_id = None
         for line in lines:
-            rs = r'^\s*(\d+)\s*|\s*' + args.enrollee_name.replace('.', '\\.')
+            rs = r'^\s*(\d+)\s*\|\s*' + args.enrollee_name.replace('.', '\\.')
             m = re.match(rs, line)
             if m != None:
                 enrollee_id = m.group(1)
