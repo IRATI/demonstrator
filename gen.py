@@ -534,7 +534,10 @@ for dif in difs:
 
         normal_ipcp["difsToRegisterAt"] = []
         for lower_dif in difs[dif][vmname]:
+            if lower_dif not in shims:
+                lower_dif = lower_dif + '.DIF'
             normal_ipcp["difsToRegisterAt"].append(lower_dif)
+
         ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
 
         ipcmconf["difConfigurations"].append({
