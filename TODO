@@ -3,3 +3,5 @@
 
 - enroll.py: use the console to get the id of an IPC process
   by name
+
+- check for cycles in DIF graph
