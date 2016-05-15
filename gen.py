@@ -160,6 +160,9 @@ while 1:
 
 fin.close()
 
+for dif in difs:
+    if dif not in dif_policies:
+        dif_policies[dif] = []
 
 ################ Compute enrollment order for DIFs ##################
 
