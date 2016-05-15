@@ -396,6 +396,9 @@ for dif in dif_ordering:
                                   enrollment['enroller'],
                                   enrollment['lower_dif']))
 
+        if enrollment['lower_dif'] not in shims:
+            enrollment['lower_dif'] = enrollment['lower_dif'] + '.DIF'
+
         outs += 'sleep 2\n' # important!!
         outs += ''\
             'DONE=255\n'\
