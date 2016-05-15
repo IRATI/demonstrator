@@ -68,7 +68,7 @@ env_dict['baseport'] = int(env_dict['baseport'])
 fin = open(args.conf, 'r')
 
 vms = dict()
-bridges = dict()
+shims = dict()
 links = []
 difs = dict()
 enrollments = dict()
@@ -86,23 +86,22 @@ while 1:
     if line.startswith('#'):
         continue
 
-    m = re.match(r'\s*eth\s+(\w+)\s+(\d+)\s+(\w.*)$', line)
+    m = re.match(r'\s*eth\s+(\d+)\s+(\w.*)$', line)
     if m:
-        bridge = m.group(1)
-        vlan = m.group(2)
-        vm_list = m.group(3).split()
+        vlan = m.group(1)
+        vm_list = m.group(2).split()
 
-        if bridge in bridges:
-            print('Error: Line %d: bridge %s already defined' \
-                                            % (linecnt, bridge))
+        if vlan in shims:
+            print('Error: Line %d: shim %s already defined' \
+                                            % (linecnt, vlan))
             continue
 
-        bridges[bridge] = {'name': bridge, 'vlan': vlan}
+        shims[vlan] = {'bridge': 'rbr' + vlan, 'vlan': vlan}
 
         for vm in vm_list:
             if vm not in vms:
                 vms[vm] = {'name': vm, 'ports': []}
-            links.append((bridge, vm))
+            links.append((vlan, vm))
 
         #for i in range(len(vm_list)-1):
         #    for j in range(i + 1, len(vm_list)):
@@ -141,9 +140,9 @@ difsdeps_inc = dict()
 for dif in difs:
     difsdeps_inc[dif] = set()
     difsdeps_adj[dif] = set()
-for bridge in bridges:
-    difsdeps_inc[bridges[bridge]['vlan']] = set()
-    difsdeps_adj[bridges[bridge]['vlan']] = set()
+for shim in shims:
+    difsdeps_inc[shim] = set()
+    difsdeps_adj[shim] = set()
 
 for dif in difs:
     for vmname in difs[dif]:
@@ -225,8 +224,8 @@ for dif in difs:
     #print(neighsets)
     #print(graph)
 
-for bridge in bridges:
-    enrollments[bridges[bridge]['vlan']] = dict()
+for shim in shims:
+    enrollments[shim] = dict()
 
 
 ###################### Generate UP script ########################
@@ -237,14 +236,14 @@ outs =  '#!/bin/bash\n'             \
         'set -x\n'                  \
         '\n';
 
-for b in sorted(bridges):
+for shim in sorted(shims):
     outs += 'sudo brctl addbr %(br)s\n'         \
             'sudo ip link set %(br)s up\n'      \
-            '\n' % {'br': b}
+            '\n' % {'br': shims[shim]['bridge']}
 
 for l in sorted(links):
-    b, vm = l
-    vlan = bridges[b]['vlan']
+    shim, vm = l
+    b = shims[shim]['bridge']
     idx = len(vms[vm]['ports']) + 1
     tap = '%s.%02x' % (vm, idx)
 
@@ -254,7 +253,7 @@ for l in sorted(links):
                 % {'tap': tap, 'br': b}
 
     vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx,
-                             'vlan': vlan})
+                             'vlan': shim})
 
 
 vmid = 1
@@ -425,10 +424,10 @@ for vmname in sorted(vms):
                 'sudo ip tuntap del mode tap name %(tap)s\n\n'  \
                     % {'tap': tap, 'br': b}
 
-for b in sorted(bridges):
+for shim in sorted(shims):
     outs += 'sudo ip link set %(br)s down\n'        \
             'sudo brctl delbr %(br)s\n'             \
-            '\n' % {'br': b}
+            '\n' % {'br': shims[shim]['bridge']}
 
 fout.write(outs)
 

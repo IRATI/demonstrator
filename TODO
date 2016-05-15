@@ -1,6 +1,3 @@
-- automatically generate bridge names, no need to specify
-  them through config file
-
 - enroll.py: use the console to get the id of an IPC process
   by name
 
