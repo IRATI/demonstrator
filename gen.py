@@ -477,6 +477,13 @@ subprocess.call(['chmod', '+x', 'down.sh'])
 
 ################## Generate IPCM/DIF configuration files ##################
 ipcmconfs = dict()
+
+if len(dif_ordering) > 0:
+    # Assume the applications are to be mapped in the DIF with the
+    # highest rank
+    for adm in gen_templates.ipcmconf_base["applicationToDIFMappings"]:
+        adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+
 for vmname in sorted(vms):
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
 
