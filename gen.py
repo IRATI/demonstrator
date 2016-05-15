@@ -537,7 +537,7 @@ for dif in difs:
 
     for policy in dif_policies[dif]:
         print(policy)
-        gen_templates.policy_translator[policy['path']](difconf, policy['ps'])
+        gen_templates.translate_policy(difconf, policy['path'], policy['ps'])
 
 
 for vmname in sorted(vms):

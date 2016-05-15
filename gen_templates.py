@@ -231,3 +231,7 @@ policy_translator = {
     'rmt.pff': lambda d, v: dict_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v),
     'rmt': lambda d, v: dict_set(d["rmtConfiguration"], "policySet", v),
 }
+
+def translate_policy(difconf, path, ps):
+    policy_translator[path](difconf, ps)
+
