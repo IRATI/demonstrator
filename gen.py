@@ -359,7 +359,7 @@ for dif in dif_ordering:
     for enrollment in enrollments[dif]:
         vm = vms[enrollment['enrollee']]
 
-        print('Enrolling %s to DIF %s against neighbor %s, through '\
+        print('I am going to enroll %s to DIF %s against neighbor %s, through '\
                 'lower DIF %s' % (enrollment['enrollee'], dif,
                                   enrollment['enroller'],
                                   enrollment['lower_dif']))
