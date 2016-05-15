@@ -488,7 +488,7 @@ for vmname in sorted(vms):
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
 
 difconfs = dict()
-for dif in sorted(difs):
+for dif in difs:
     difconfs[dif] = copy.deepcopy(gen_templates.normal_dif_base)
 
 for vmname in sorted(vms):
@@ -521,7 +521,7 @@ for vmname in sorted(vms):
 for dif in difs:
     difconf = difconfs[dif]
 
-    for vmname in sorted(difs[dif]):
+    for vmname in difs[dif]:
         vm = vms[vmname]
         ipcmconf = ipcmconfs[vmname]
 
@@ -559,6 +559,7 @@ for vmname in sorted(vms):
 
 for dif in sorted(difs):
     # Dump the normal DIF configuration files
+    difconf = difconfs[dif]
     difconf_str = json.dumps(difconf, indent = 4, sort_keys = True) % env_dict
     fout = open('normal.%s.dif' % (dif,), 'w')
     fout.write(difconf_str);
