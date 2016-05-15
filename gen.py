@@ -178,8 +178,6 @@ while len(frontier):
             frontier.add(nxt)
     difsdeps_adj[cur] = set()
 
-print(dif_ordering)
-
 
 ####################### Compute DIF graphs #######################
 for dif in difs:
@@ -226,6 +224,9 @@ for dif in difs:
 
     #print(neighsets)
     #print(graph)
+
+for bridge in bridges:
+    enrollments[bridges[bridge]['vlan']] = dict()
 
 
 ###################### Generate UP script ########################
@@ -346,7 +347,8 @@ for vmname in sorted(vms):
                           'vmname': vm['name']}
 
 
-for dif in difs:
+# Run the enrollment operations in an order which respect the dependencies
+for dif in dif_ordering:
     for enrollment in enrollments[dif]:
         vm = vms[enrollment['enrollee']]
 
