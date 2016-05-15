@@ -84,6 +84,7 @@ shims = dict()
 links = []
 difs = dict()
 enrollments = dict()
+dif_policies = dict()
 
 linecnt = 0
 
@@ -141,8 +142,22 @@ while 1:
 
         continue
 
+    m = re.match(r'\s*policy\s+(\w+)\s+([\w.-]+)\s+([\w-]+)', line)
+    if m:
+        dif = m.group(1)
+        path = m.group(2)
+        ps = m.group(3)
+
+        if dif not in dif_policies:
+            dif_policies[dif] = []
+
+        dif_policies[dif].append({'path': path, 'ps': ps})
+
+        continue
+
 fin.close()
 
+print(dif_policies)
 
 ################ Compute enrollment order for DIFs ##################
 
