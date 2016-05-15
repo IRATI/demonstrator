@@ -372,7 +372,7 @@ for dif in dif_ordering:
             'set -x\n'\
             'sudo enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
-                        '--enrollee-id %(eid)s '\
+                        '--enrollee-name %(dif)s.%(id)s.IPCP '\
                         '--enroller-name %(dif)s.%(pvid)s.IPCP\n'\
             'sleep 1\n'\
             'true\n'\
@@ -385,7 +385,6 @@ for dif in dif_ordering:
                           'pvid': vms[enrollment['enroller']]['id'],
                           'username': env_dict['username'],
                           'vmname': vm['name'],
-                          'eid': len(vm['ports']) + 1,
                           'dif': dif, 'ldif': enrollment['lower_dif']}
 
 fout.write(outs)

@@ -13,6 +13,16 @@ def printalo(byt):
     print(repr(byt).replace('\\n', '\n'))
 
 
+def get_response(s):
+    data = bytes()
+    while 1:
+        data += s.recv(1024)
+        lines = str(data).replace('\\n', '\n').split('\n')
+        #print(lines)
+        if lines[-1].find("IPCM") != -1:
+            return lines[:len(lines)-1]
+
+
 description = "Python script to enroll IPCPs"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -20,8 +30,8 @@ argparser = argparse.ArgumentParser(description = description,
                                     epilog = epilog)
 argparser.add_argument('--ipcm-conf', help = "Path to the IPCM configuration file",
                        type = str, required = True)
-argparser.add_argument('--enrollee-id', help = "ID of the enrolling IPCP",
-                       type = int, required = True)
+argparser.add_argument('--enrollee-name', help = "Name of the enrolling IPCP",
+                       type = str, required = True)
 argparser.add_argument('--dif', help = "Name of DIF to enroll to",
                        type = str, required = True)
 argparser.add_argument('--lower-dif', help = "Name of the lower level DIF",
@@ -64,18 +74,41 @@ while trials < 4:
 
 if connected:
     try:
-        data = s.recv(1024)
-        printalo(data)
+        # Receive the banner
+        get_response(s)
 
+        # Send the IPCP list command
+        cmd = 'list-ipcps\n'
+        s.sendall(bytes(cmd, 'ascii'))
+
+        # Get the list of IPCPs and parse it to look for the enroller ID
+        lines = get_response(s)
+        print(lines)
+        enrollee_id = None
+        for line in lines:
+            rs = r'^\s*(\d+)\s*|\s*' + args.enrollee_name
+            m = re.search(rs, line)
+            if m != None:
+                enrollee_id = m.group(1)
+
+        if enrollee_id == None:
+            print('Could not find the ID of enrollee IPCP %s' \
+                    % args.enrollee_name)
+            raise Exception()
+
+        # Send the enroll command
         cmd = 'enroll-to-dif %s %s %s %s 1\n' \
-                % (args.enrollee_id, args.dif, args.lower_dif, args.enroller_name)
+                % (enrollee_id, args.dif, args.lower_dif, args.enroller_name)
+        print(cmd)
 
         s.sendall(bytes(cmd, 'ascii'))
 
-        data = s.recv(1024)
-        printalo(data)
+        # Get the enroll command answer
+        lines = get_response(s)
+        print(lines)
     except:
-        pass
+        s.close()
+        raise
 
 else:
     print('Failed to connect to "%s"' % socket_name)
