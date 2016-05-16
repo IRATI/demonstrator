@@ -37,6 +37,9 @@ def graphviz_out(name, graph):
 
     for vmname in graph:
         for (neigh, lower_dif) in graph[vmname]:
+            if vmname > neigh:
+                # Use lexicographical filter to avoid duplicate edges
+                continue
             edge = pydot.Edge(vmname, neigh, label = lower_dif)
             gvizg.add_edge(edge)
 
