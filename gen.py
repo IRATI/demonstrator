@@ -164,7 +164,7 @@ for dif in difs:
     if dif not in dif_policies:
         dif_policies[dif] = []
 
-################ Compute enrollment order for DIFs ##################
+############ Compute registration/enrollment order for DIFs ###############
 
 # Compute DIFs dependency graph, as both adjacency and incidence list.
 difsdeps_adj = dict()
@@ -487,7 +487,7 @@ if len(dif_ordering) > 0:
     for adm in gen_templates.ipcmconf_base["applicationToDIFMappings"]:
         adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
 
-for vmname in sorted(vms):
+for vmname in vms:
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
 
 difconfs = dict()
@@ -521,7 +521,18 @@ for vmname in sorted(vms):
         fout.close()
 
 
-for dif in difs:
+# Run over dif_ordering array, to make sure each IPCM config has
+# the correct ordering for the ipcProcessesToCreate list of operations.
+# If we iterated over the difs map, the order would be randomic, and so
+# some IPCP registrations in lower DIFs may fail. This would happen because
+# at the moment of registration, it may be that the IPCP of the lower DIF
+# has not been created yet.
+for dif in dif_ordering:
+
+    if dif in shims:
+        # Shims are managed separately, in the previous loop
+        continue
+
     difconf = difconfs[dif]
 
     for vmname in difs[dif]:
@@ -555,7 +566,7 @@ for dif in difs:
         gen_templates.translate_policy(difconf, policy['path'], policy['ps'])
 
 
-for vmname in sorted(vms):
+for vmname in vms:
     # Dump the IPCM configuration files
     ipcmconf_str = json.dumps(ipcmconfs[vmname], indent = 4,
                               sort_keys = True) % env_dict
@@ -563,7 +574,7 @@ for vmname in sorted(vms):
     fout.write(ipcmconf_str);
     fout.close()
 
-for dif in sorted(difs):
+for dif in difs:
     # Dump the normal DIF configuration files
     difconf = difconfs[dif]
     difconf_str = json.dumps(difconf, indent = 4, sort_keys = True) % env_dict
