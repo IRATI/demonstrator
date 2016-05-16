@@ -21,6 +21,10 @@ def which(program):
         quit(1)
 
 
+def graphviz_out(graph):
+    pass
+
+
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -29,6 +33,8 @@ argparser = argparse.ArgumentParser(description = description,
 argparser.add_argument('-c', '--conf',
                        help = "gen.conf configuration file", type = str,
                        default = 'gen.conf')
+argparser.add_argument('-g', '--graphviz', action='store_true',
+                       help = "Generate DIF graphs with graphviz")
 args = argparser.parse_args()
 
 
@@ -85,6 +91,7 @@ links = []
 difs = dict()
 enrollments = dict()
 dif_policies = dict()
+dif_graphs = dict()
 
 linecnt = 0
 
@@ -221,7 +228,7 @@ if len(circular_set):
 ####################### Compute DIF graphs #######################
 for dif in difs:
     neighsets = dict()
-    graph = dict()
+    dif_graphs[dif] = dict()
     first = None
 
     # For each N-1-DIF supporting this DIF, compute the set of nodes that
@@ -229,7 +236,7 @@ for dif in difs:
     # the N-1-DIF for the current DIF.
 
     for vmname in difs[dif]:
-        graph[vmname] = [] # init for later use
+        dif_graphs[dif][vmname] = [] # init for later use
         if first == None: # pick any node for later use
             first = vmname
         first = vmname
@@ -244,7 +251,7 @@ for dif in difs:
         for vm1 in neighsets[lower_dif]:
             for vm2 in neighsets[lower_dif]:
                 if vm1 != vm2:
-                    graph[vm1].append((vm2, lower_dif))
+                    dif_graphs[dif][vm1].append((vm2, lower_dif))
 
     # To generate the list of enrollments, we simulate one,
     # using breadth-first trasversal.
@@ -253,7 +260,7 @@ for dif in difs:
     enrollments[dif] = []
     while len(frontier):
         cur = frontier.pop()
-        for edge in graph[cur]:
+        for edge in dif_graphs[dif][cur]:
             if edge[0] not in enrolled:
                 enrolled.add(edge[0])
                 enrollments[dif].append({'enrollee': edge[0],
@@ -262,7 +269,7 @@ for dif in difs:
                 frontier.add(edge[0])
 
     #print(neighsets)
-    #print(graph)
+    #print(dif_graphs[dif])
 
 for shim in shims:
     enrollments[shim] = dict()
@@ -581,4 +588,8 @@ for dif in difs:
     fout = open('normal.%s.dif' % (dif,), 'w')
     fout.write(difconf_str);
     fout.close()
+
+
+for dif in difs:
+    graphviz_out(dif_graphs[dif])
 
