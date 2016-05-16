@@ -22,24 +22,6 @@ def which(program):
         quit(1)
 
 
-def graphviz_out(name, graph):
-    gvizg = pydot.Dot(graph_type='graph')
-
-    for vmname in graph:
-        node = pydot.Node(vmname, style="filled", fillcolor="orange")
-        gvizg.add_node(node)
-
-    for vmname in graph:
-        for (neigh, lower_dif) in graph[vmname]:
-            if vmname > neigh:
-                # Use lexicographical filter to avoid duplicate edges
-                continue
-            edge = pydot.Edge(vmname, neigh, label = lower_dif)
-            gvizg.add_edge(edge)
-
-    gvizg.write_png('%s.png' % name)
-
-
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -608,8 +590,34 @@ for dif in difs:
 if args.graphviz:
     try:
         import pydot
+
+        colors = ['red', 'green', 'blue', 'orange', 'yellow']
+        fcolors = ['black', 'black', 'white', 'black', 'black']
+
+        gvizg = pydot.Dot(graph_type = 'graph')
+        i = 0
         for dif in difs:
-            graphviz_out(dif, dif_graphs[dif])
+            for vmname in dif_graphs[dif]:
+                node = pydot.Node(dif + vmname,
+                                  label = "%s(%s)" % (vmname, dif),
+                                  style = "filled", fillcolor = colors[i],
+                                  fontcolor = fcolors[i])
+                gvizg.add_node(node)
+
+            for vmname in dif_graphs[dif]:
+                for (neigh, lower_dif) in dif_graphs[dif][vmname]:
+                    if vmname > neigh:
+                        # Use lexicographical filter to avoid duplicate edges
+                        continue
+                    edge = pydot.Edge(dif + vmname, dif + neigh,
+                                      label = lower_dif)
+                    gvizg.add_edge(edge)
+
+            i += 1
+            if i == len(colors):
+                i = 0
+
+        gvizg.write_png('difs.png')
     except:
         print("Warning: pydot module not installed, cannot produce DIF "\
               "graphs images")
