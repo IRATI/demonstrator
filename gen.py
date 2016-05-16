@@ -22,8 +22,25 @@ def which(program):
         quit(1)
 
 
-def graphviz_out(graph):
-    pass
+def graphviz_out(name, graph):
+    try:
+        import pydot
+    except:
+        print("pydot module not installed")
+        return
+
+    gvizg = pydot.Dot(graph_type='graph')
+
+    for vmname in graph:
+        node = pydot.Node(vmname, style="filled", fillcolor="orange")
+        gvizg.add_node(node)
+
+    for vmname in graph:
+        for (neigh, lower_dif) in graph[vmname]:
+            edge = pydot.Edge(vmname, neigh, label = lower_dif)
+            gvizg.add_edge(edge)
+
+    gvizg.write_png('%s.png' % name)
 
 
 description = "Python script to generate IRATI deployments for Virtual Machines"
@@ -591,6 +608,7 @@ for dif in difs:
     fout.close()
 
 
-for dif in difs:
-    graphviz_out(dif_graphs[dif])
+if args.graphviz:
+    for dif in difs:
+        graphviz_out(dif, dif_graphs[dif])
 
