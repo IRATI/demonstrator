@@ -14,8 +14,9 @@ import os
 
 
 def which(program):
-    retcode = subprocess.call(['which', program], stderr = subprocess.DEVNULL,
-                              stdout = subprocess.DEVNULL)
+    FNULL = open(os.devnull, 'w')
+    retcode = subprocess.call(['which', program], stdout = FNULL,
+                              stderr = subprocess.STDOUT)
     if retcode != 0:
         print('Fatal error: Cannot find "%s" program' % program)
         quit(1)
