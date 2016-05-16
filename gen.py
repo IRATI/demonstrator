@@ -23,12 +23,6 @@ def which(program):
 
 
 def graphviz_out(name, graph):
-    try:
-        import pydot
-    except:
-        print("pydot module not installed")
-        return
-
     gvizg = pydot.Dot(graph_type='graph')
 
     for vmname in graph:
@@ -612,6 +606,11 @@ for dif in difs:
 
 
 if args.graphviz:
-    for dif in difs:
-        graphviz_out(dif, dif_graphs[dif])
+    try:
+        import pydot
+        for dif in difs:
+            graphviz_out(dif, dif_graphs[dif])
+    except:
+        print("Warning: pydot module not installed, cannot produce DIF "\
+              "graphs images")
 
