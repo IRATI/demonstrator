@@ -40,8 +40,8 @@ argparser.add_argument('-c', '--conf',
                        default = 'gen.conf')
 argparser.add_argument('-g', '--graphviz', action='store_true',
                        help = "Generate DIF graphs with graphviz")
-argparser.add_argument('--buildroot', action='store_true',
-                       help = "Use buildroot VMs")
+argparser.add_argument('--legacy', action='store_true',
+                       help = "Use qcow2 image rather than buildroot ramfs")
 argparser.add_argument('-m', '--memory',
                        help = "Amount of memory in megabytes", type = int,
                        default = '128')
@@ -52,16 +52,16 @@ which('brctl')
 which('qemu-system-x86_64')
 
 
-if args.buildroot:
+if args.legacy:
+    sshopts = ''
+    sudo = 'sudo'
+else:
     sshopts = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '\
               '-o IdentityFile=buildroot/irati_rsa'
     sudo = ''
-else:
-    sshopts = ''
-    sudo = 'sudo'
 
 
-if not args.buildroot:
+if args.legacy:
     ######################## Compile mac2ifname program ########################
     try:
         subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
@@ -103,7 +103,7 @@ env_dict['baseport'] = int(env_dict['baseport'])
 env_dict['varpath'] = env_dict['installpath']
 
 
-if args.buildroot:
+if not args.legacy:
     # overwrite vmimgpath, installpath, varpath, username
     env_dict['vmimgpath'] = 'buildroot/rootfs.cpio'
     env_dict['installpath'] = '/usr'
@@ -350,7 +350,7 @@ for vmname in sorted(vms):
                  'memory': args.memory}
 
     outs += 'qemu-system-x86_64 '
-    if args.buildroot:
+    if not args.legacy:
         outs += '-kernel buildroot/bzImage '                            \
                 '-append "console=ttyS0" '                              \
                 '-initrd %(vmimgpath)s '                                \
@@ -393,7 +393,7 @@ for vmname in sorted(vms):
     gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif da.map '\
                      '%(name)s.ipcm.conf ' % {'name': vm['name']}
     gen_files_bin = 'enroll.py '
-    if not args.buildroot:
+    if args.legacy:
         gen_files_bin += 'mac2ifname '
     gen_files = gen_files_conf + gen_files_bin
 
@@ -429,7 +429,7 @@ for vmname in sorted(vms):
                        'id': vm['id'], 'vlan': port['vlan'],
                        'vmname': vm['name']}
 
-    if not args.buildroot:
+    if args.legacy:
         outs +=     '$SUDO modprobe shim-eth-vlan\n'\
                     '$SUDO modprobe normal-ipcp\n'
     outs +=     '$SUDO modprobe rina-default-plugin\n'\
