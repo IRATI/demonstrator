@@ -41,6 +41,13 @@ which('brctl')
 which('qemu-system-x86_64')
 
 
+if args.buildroot:
+    sshopts = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '\
+              '-o IdentityFile=buildroot/irati_rsa'
+else:
+    sshopts = ''
+
+
 ######################## Compile mac2ifname program ########################
 try:
     subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
@@ -354,13 +361,13 @@ for vmname in sorted(vms):
     outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   scp -P %(ssh)s %(genfiles)s %(username)s@localhost: \n'\
+            '   scp %(sshopts)s -P %(ssh)s %(genfiles)s %(username)s@localhost: \n'\
             '   DONE=$?\n'\
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
             '   fi\n'\
             'done\n\n'\
-            'ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
+            'ssh %(sshopts)s -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
                 'set -x\n'\
                 'sudo hostname %(name)s\n'\
                 '\n'\
@@ -369,7 +376,8 @@ for vmname in sorted(vms):
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
-                    'genfilesbin': gen_files_bin, 'vmname': vm['name']}
+                    'genfilesbin': gen_files_bin, 'vmname': vm['name'],
+                    'sshopts': sshopts}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
@@ -409,7 +417,7 @@ for dif in dif_ordering:
         outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   ssh -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
+            '   ssh %(sshopts)s -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
             'sudo enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
@@ -426,7 +434,8 @@ for dif in dif_ordering:
                           'pvid': vms[enrollment['enroller']]['id'],
                           'username': env_dict['username'],
                           'vmname': vm['name'],
-                          'dif': dif, 'ldif': enrollment['lower_dif']}
+                          'dif': dif, 'ldif': enrollment['lower_dif'],
+                          'sshopts': sshopts}
 
 fout.write(outs)
 
