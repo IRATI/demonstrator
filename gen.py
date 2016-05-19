@@ -32,6 +32,8 @@ argparser.add_argument('-c', '--conf',
                        default = 'gen.conf')
 argparser.add_argument('-g', '--graphviz', action='store_true',
                        help = "Generate DIF graphs with graphviz")
+argparser.add_argument('--buildroot', action='store_true',
+                       help = "Use buildroot VMs")
 args = argparser.parse_args()
 
 
