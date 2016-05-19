@@ -4,7 +4,7 @@ ipcmconf_base = {
             "localConfiguration": {
                 "installationPath": "%(installpath)s/bin",
                 "libraryPath": "%(installpath)s/lib",
-                "logPath": "%(installpath)s/var/log",
+                "logPath": "%(varpath)s/var/log",
                 "consoleSocket": "%(installpath)s/var/run/ipcm-console.sock",
                 "pluginsPaths": [
                         "%(installpath)s/lib/rinad/ipcp",
