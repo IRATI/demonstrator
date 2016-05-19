@@ -44,8 +44,10 @@ which('qemu-system-x86_64')
 if args.buildroot:
     sshopts = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '\
               '-o IdentityFile=buildroot/irati_rsa'
+    sudo = ''
 else:
     sshopts = ''
+    sudo = 'sudo'
 
 
 ######################## Compile mac2ifname program ########################
@@ -390,31 +392,32 @@ for vmname in sorted(vms):
             'done\n\n'\
             'ssh %(sshopts)s -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
                 'set -x\n'\
-                'sudo hostname %(name)s\n'\
+                'SUDO=%(sudo)s\n'\
+                '$SUDO hostname %(name)s\n'\
                 '\n'\
-                'sudo mv %(genfilesconf)s /etc\n'\
-                'sudo mv %(genfilesbin)s /usr/bin\n'\
+                '$SUDO mv %(genfilesconf)s /etc\n'\
+                '$SUDO mv %(genfilesbin)s /usr/bin\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
                     'genfilesbin': gen_files_bin, 'vmname': vm['name'],
-                    'sshopts': sshopts}
+                    'sshopts': sshopts, 'sudo': sudo}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
-                'sudo ip link set $PORT up\n'\
-                'sudo ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
-                'sudo ip link set $PORT.%(vlan)s up\n'\
-                'sudo sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth.%(vmname)s.%(vlan)s.dif\n'\
+                '$SUDO ip link set $PORT up\n'\
+                '$SUDO ip link add link $PORT name $PORT.%(vlan)s type vlan id %(vlan)s\n'\
+                '$SUDO ip link set $PORT.%(vlan)s up\n'\
+                '$SUDO sed -i "s|ifc%(idx)s|$PORT|g" /etc/shimeth.%(vmname)s.%(vlan)s.dif\n'\
                     % {'mac': port['mac'], 'idx': port['idx'],
                        'id': vm['id'], 'vlan': port['vlan'],
                        'vmname': vm['name']}
 
     if not args.buildroot:
-        outs +=     'sudo modprobe shim-eth-vlan\n'\
-                    'sudo modprobe normal-ipcp\n'
-    outs +=     'sudo modprobe rina-default-plugin\n'\
-                'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" '\
+        outs +=     '$SUDO modprobe shim-eth-vlan\n'\
+                    '$SUDO modprobe normal-ipcp\n'
+    outs +=     '$SUDO modprobe rina-default-plugin\n'\
+                '$SUDO %(installpath)s/bin/ipcm -a "scripting, console, mad" '\
                             '-c /etc/%(vmname)s.ipcm.conf -l DEBUG &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
@@ -441,7 +444,8 @@ for dif in dif_ordering:
             'while [ $DONE != "0" ]; do\n'\
             '   ssh %(sshopts)s -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
-            'sudo enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
+            'SUDO=%(sudo)s\n'\
+            '$SUDO enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
                         '--enrollee-name %(dif)s.%(id)s.IPCP '\
                         '--enroller-name %(dif)s.%(pvid)s.IPCP\n'\
@@ -457,7 +461,7 @@ for dif in dif_ordering:
                           'username': env_dict['username'],
                           'vmname': vm['name'],
                           'dif': dif, 'ldif': enrollment['lower_dif'],
-                          'sshopts': sshopts}
+                          'sshopts': sshopts, 'sudo': sudo}
 
 fout.write(outs)
 
