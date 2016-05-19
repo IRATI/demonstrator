@@ -331,19 +331,31 @@ for vmname in sorted(vms):
 
     vm['ssh'] = fwdp
 
-    outs += ''                                                  \
-            'qemu-system-x86_64 "%(vmimage)s" '   \
-            '-snapshot '                                                \
-            '--enable-kvm '                                             \
+    vars_dict = {'fwdp': fwdp, 'id': vmid, 'mac': mac,
+                 'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc}
+
+    outs += 'qemu-system-x86_64 '
+    if args.buildroot:
+        outs += '-kernel buildroot/bzImage '                            \
+                '-append "console=ttyS0" '                              \
+                '-initrd %(vmimgpath)s '                                \
+                '-nographic ' % vars_dict
+    else:
+        outs += '"%(vmimgpath)s" '                                      \
+                '-snapshot '                                            \
+                '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '         \
+                '-display none ' % vars_dict
+
+    outs += '--enable-kvm '                                             \
             '-smp 2 '                                                   \
             '-m 128M '                                                  \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
-            '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '             \
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
-            '-display none ' % {'fwdp': fwdp, 'id': vmid, 'mac': mac,
-                                'vmimage': env_dict['vmimgpath'], 'fwdc': fwdc}
+                        % vars_dict
+
+    del vars_dict
 
     for port in vm['ports']:
         tap = port['tap']
