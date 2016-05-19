@@ -398,9 +398,10 @@ for vmname in sorted(vms):
                        'id': vm['id'], 'vlan': port['vlan'],
                        'vmname': vm['name']}
 
-    outs +=     'sudo modprobe shim-eth-vlan\n'\
-                'sudo modprobe normal-ipcp\n'\
-                'sudo modprobe rina-default-plugin\n'\
+    if not args.buildroot:
+        outs +=     'sudo modprobe shim-eth-vlan\n'\
+                    'sudo modprobe normal-ipcp\n'
+    outs +=     'sudo modprobe rina-default-plugin\n'\
                 'sudo %(installpath)s/bin/ipcm -a "scripting, console, mad" '\
                             '-c /etc/%(vmname)s.ipcm.conf -l DEBUG &> log &\n'\
                 'sleep 1\n'\
