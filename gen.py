@@ -34,6 +34,9 @@ argparser.add_argument('-g', '--graphviz', action='store_true',
                        help = "Generate DIF graphs with graphviz")
 argparser.add_argument('--buildroot', action='store_true',
                        help = "Use buildroot VMs")
+argparser.add_argument('-m', '--memory',
+                       help = "Amount of memory in megabytes", type = int,
+                       default = '128')
 args = argparser.parse_args()
 
 
@@ -335,7 +338,8 @@ for vmname in sorted(vms):
     vm['ssh'] = fwdp
 
     vars_dict = {'fwdp': fwdp, 'id': vmid, 'mac': mac,
-                 'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc}
+                 'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc,
+                 'memory': args.memory}
 
     outs += 'qemu-system-x86_64 '
     if args.buildroot:
@@ -352,7 +356,7 @@ for vmname in sorted(vms):
     outs += '-display none '                                            \
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
-            '-m 128M '                                                  \
+            '-m %(memory)sM '                                           \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-vga std '                                                 \
@@ -421,7 +425,7 @@ for vmname in sorted(vms):
         outs +=     '$SUDO modprobe shim-eth-vlan\n'\
                     '$SUDO modprobe normal-ipcp\n'
     outs +=     '$SUDO modprobe rina-default-plugin\n'\
-                '$SUDO %(installpath)s/bin/ipcm -a "scripting, console, mad" '\
+                '$SUDO %(installpath)s/bin/ipcm -a \"scripting, console, mad\" '\
                             '-c /etc/%(vmname)s.ipcm.conf -l DEBUG &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
