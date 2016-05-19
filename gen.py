@@ -86,6 +86,15 @@ for key in keywords:
         quit(1)
 
 env_dict['baseport'] = int(env_dict['baseport'])
+env_dict['varpath'] = env_dict['installpath']
+
+
+if args.buildroot:
+    # overwrite vmimgpath, installpath, varpath, username
+    env_dict['vmimgpath'] = 'buildroot/rootfs.cpio'
+    env_dict['installpath'] = '/usr'
+    env_dict['varpath'] = ''
+    env_dict['username'] = 'root'
 
 
 ############################# Parse gen.conf ##############################
