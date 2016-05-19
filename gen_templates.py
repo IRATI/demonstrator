@@ -1,39 +1,42 @@
 # Template for a IPCM configuration file
 ipcmconf_base = {
-            "configFileVersion": "1.4.1",
-            "localConfiguration": {
-                "installationPath": "%(installpath)s/bin",
-                "libraryPath": "%(installpath)s/lib",
-                "logPath": "%(varpath)s/var/log",
-                "consoleSocket": "%(varpath)s/var/run/ipcm-console.sock",
-                "pluginsPaths": [
-                        "%(installpath)s/lib/rinad/ipcp",
-                        "/lib/modules/4.1.16-irati/extra"
-                ]
-                },
+    "configFileVersion": "1.4.1",
+    "localConfiguration": {
+        "installationPath": "%(installpath)s/bin",
+        "libraryPath": "%(installpath)s/lib",
+        "logPath": "%(varpath)s/var/log",
+        "consoleSocket": "%(varpath)s/var/run/ipcm-console.sock",
+        "pluginsPaths": [
+                "%(installpath)s/lib/rinad/ipcp",
+                "/lib/modules/4.1.16-irati/extra"
+        ]
+        },
 
-            "applicationToDIFMappings": [
-                {
-                    "encodedAppName": "rina.apps.echotime.server-1--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime.client-1--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime-2--",
-                    "difName": "n.DIF"
-                },
-                {
-                    "encodedAppName": "rina.apps.echotime.client-2--",
-                    "difName": "n.DIF"
-                }
-            ],
+    "ipcProcessesToCreate": [],
+    "difConfigurations": [],
+}
 
-            "ipcProcessesToCreate": [],
-            "difConfigurations": [],
+
+da_map_base = {
+    "applicationToDIFMappings": [
+        {
+            "encodedAppName": "rina.apps.echotime.server-1--",
+            "difName": "n.DIF"
+        },
+        {
+            "encodedAppName": "rina.apps.echotime.client-1--",
+            "difName": "n.DIF"
+        },
+        {
+            "encodedAppName": "rina.apps.echotime-2--",
+            "difName": "n.DIF"
+        },
+        {
+            "encodedAppName": "rina.apps.echotime.client-2--",
+            "difName": "n.DIF"
         }
+    ],
+}
 
 
 # Template for a normal DIF configuration file

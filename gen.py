@@ -22,6 +22,14 @@ def which(program):
         quit(1)
 
 
+def dict_dump_json(file_name, dictionary, env_dict):
+    dictionary_str = json.dumps(dictionary, indent = 4,
+                                sort_keys = True) % env_dict
+    fout = open(file_name, 'w')
+    fout.write(dictionary_str);
+    fout.close()
+
+
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -382,8 +390,8 @@ for vmname in sorted(vms):
 for vmname in sorted(vms):
     vm = vms[vmname]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif %(name)s.ipcm.conf ' \
-                        % {'name': vm['name']}
+    gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif da.map '\
+                     '%(name)s.ipcm.conf ' % {'name': vm['name']}
     gen_files_bin = 'enroll.py '
     if not args.buildroot:
         gen_files_bin += 'mac2ifname '
@@ -533,7 +541,7 @@ ipcmconfs = dict()
 if len(dif_ordering) > 0:
     # Assume the applications are to be mapped in the DIF with the
     # highest rank
-    for adm in gen_templates.ipcmconf_base["applicationToDIFMappings"]:
+    for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
         adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
 
 for vmname in vms:
@@ -615,22 +623,16 @@ for dif in dif_ordering:
         gen_templates.translate_policy(difconf, policy['path'], policy['ps'])
 
 
+# Dump the DIF Allocator map
+dict_dump_json('da.map', gen_templates.da_map_base, env_dict)
+
 for vmname in vms:
     # Dump the IPCM configuration files
-    ipcmconf_str = json.dumps(ipcmconfs[vmname], indent = 4,
-                              sort_keys = True) % env_dict
-    fout = open('%s.ipcm.conf' % (vmname,), 'w')
-    fout.write(ipcmconf_str);
-    fout.close()
+    dict_dump_json('%s.ipcm.conf' % (vmname,), ipcmconfs[vmname], env_dict)
 
 for dif in difs:
     # Dump the normal DIF configuration files
-    difconf = difconfs[dif]
-    difconf_str = json.dumps(difconf, indent = 4, sort_keys = True) % env_dict
-    fout = open('normal.%s.dif' % (dif,), 'w')
-    fout.write(difconf_str);
-    fout.close()
-
+    dict_dump_json('normal.%s.dif' % (dif,), difconfs[dif], env_dict)
 
 if args.graphviz:
     try:
