@@ -50,12 +50,13 @@ else:
     sudo = 'sudo'
 
 
-######################## Compile mac2ifname program ########################
-try:
-    subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
-except:
-    print('Cannot find a C compiler to compile mac2ifname program')
-    quit(1)
+if not args.buildroot:
+    ######################## Compile mac2ifname program ########################
+    try:
+        subprocess.call(['cc', '-Wall', '-o', 'mac2ifname', 'mac2ifname.c'])
+    except:
+        print('Cannot find a C compiler to compile mac2ifname program')
+        quit(1)
 
 env_dict = {}
 keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
@@ -378,7 +379,9 @@ for vmname in sorted(vms):
 
     gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif %(name)s.ipcm.conf ' \
                         % {'name': vm['name']}
-    gen_files_bin = 'enroll.py mac2ifname '
+    gen_files_bin = 'enroll.py '
+    if not args.buildroot:
+        gen_files_bin += 'mac2ifname '
     gen_files = gen_files_conf + gen_files_bin
 
     outs += ''\
