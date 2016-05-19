@@ -347,9 +347,10 @@ for vmname in sorted(vms):
         outs += '"%(vmimgpath)s" '                                      \
                 '-snapshot '                                            \
                 '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '         \
-                '-display none ' % vars_dict
+                                % vars_dict
 
-    outs += '--enable-kvm '                                             \
+    outs += '-display none '                                            \
+            '--enable-kvm '                                             \
             '-smp 2 '                                                   \
             '-m 128M '                                                  \
             '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
