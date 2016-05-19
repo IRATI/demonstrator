@@ -56,7 +56,7 @@ except:
     quit(1)
 
 env_dict = {}
-keywords = ['vmimgpath', 'installpath', 'varpath', 'username', 'baseport']
+keywords = ['vmimgpath', 'installpath', 'username', 'baseport']
 
 
 ############################## Parse gen.env ###############################
