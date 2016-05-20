@@ -51,6 +51,8 @@ args = argparser.parse_args()
 which('brctl')
 which('qemu-system-x86_64')
 
+subprocess.call(['chmod', '0400', 'buildroot/irati_rsa'])
+
 
 if args.legacy:
     sshopts = ''
