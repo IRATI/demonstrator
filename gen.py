@@ -137,17 +137,20 @@ while 1:
     if line.startswith('#'):
         continue
 
-    m = re.match(r'\s*eth\s+(\d+)\s+(\w.*)$', line)
+    m = re.match(r'\s*eth\s+(\d+)\s+(\d+)([GMK])bps\s+(\w.*)$', line)
     if m:
         vlan = m.group(1)
-        vm_list = m.group(2).split()
+        speed = int(m.group(2))
+        speed_unit = m.group(3).lower()
+        vm_list = m.group(4).split()
 
         if vlan in shims:
             print('Error: Line %d: shim %s already defined' \
                                             % (linecnt, vlan))
             continue
 
-        shims[vlan] = {'bridge': 'rbr' + vlan, 'vlan': vlan}
+        shims[vlan] = {'bridge': 'rbr' + vlan, 'vlan': vlan, 'speed': speed,
+                       'speed_unit': speed_unit}
 
         for vm in vm_list:
             if vm not in vms:
@@ -329,6 +332,17 @@ for l in sorted(links):
             'sudo ip link set %(tap)s up\n'                 \
             'sudo brctl addif %(br)s %(tap)s\n\n'           \
                 % {'tap': tap, 'br': b}
+
+    if shims[shim]['speed'] > 0:
+        speed = '%d%sbit' % (shims[shim]['speed'], shims[shim]['speed_unit'])
+        # Rate limit the traffic transmitted on the TAP interface
+        outs += 'sudo tc qdisc add dev %(tap)s handle 1: root '     \
+                                'htb default 11\n'                  \
+                'sudo tc class add dev %(tap)s parent 1: classid '  \
+                                '1:1 htb rate 10gbit\n'             \
+                'sudo tc class add dev %(tap)s parent 1:1 classid ' \
+                                '1:11 htb rate %(speed)s\n'         \
+                % {'tap': tap, 'speed': speed}
 
     vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx,
                              'vlan': shim})
