@@ -1,3 +1,87 @@
+###############################################################################
+# 1. INTRODUCTION                                                             #
+###############################################################################
+
+This repository contains a command-line tool (gen.py) which allows the user to
+try and test the IRATI in a multi-node scenario with the minimum possible
+effort.
+
+Each node is emulated using a light Virtual Machine (VM), run under the control
+of the QEMU hypervisor. All the VMs are run locally without any risk for your
+PC, so you don't need a dedicated machine or multiple physical machines.
+
+All the user has to do is to prepare a configuration file which describes the
+scenario to be demonstrated. This requires the user to specify all the Layer 2
+connections between the nodes and all the DIFs which lay over this L2 topology.
+A DIF can be stacked over other DIFs, and arbitrary level of recursion is
+virtually supported by the tool (Be aware that the IRATI stack may place
+restrictions on the recursion depth, so the scenario bootstrap may fail).
+
+The syntax of the configuration file is detailed in section 3.
+
+Once the configuration file has been prepared, the user can invoke the tool
+
+    $ ./gen.py -c /path/to/config/file
+
+which will generate two bash scripts: up.sh and down.sh.
+
+Running the up.sh script will bootstrap the specified scenario, which involves
+the following operations:
+
+    - Create TAP interfaces and linux software-bridges to emulate the
+      specified L2 topology.
+
+    - Run the VMs emulating the nodes.
+
+    - Bootstrap the IRATI stack on each node, with proper configuration
+      (IPCM configuration, DIF templates, DIF Allocator map, ...)
+
+    - Perform all the enrollment, at all DIF layers, respecting the
+      dependency order.
+
+The up.sh script reports verbose information about ongoing operations. If
+everything goes well, you should be able to see the script reporting about
+successful enrollment operations right before terminating.
+
+Once the bootstrap is complete, the user can access any node an play with
+them (e.g. running the rina-echo-time test application to check connectivity
+between the nodes).
+
+To undo the operations carried out by the up.sh, the user can run the down.sh
+script. Once the latter script terminates, the VMs have been terminated.
+
+
+###############################################################################
+# 2. HARDWARE AND SOFTWARE REQUIREMENTS                                       #
+###############################################################################
+
+  - An x86\_64 processor with hardware-assisted virtualization support (e.g.
+    Intel VT-X or AMD-V)
+
+  - Linux-based Operating System.
+
+  - QEMU, a fast and portable machine emulator.
+
+  - brctl command-lilne tool (usually found in a distro package called
+    bridge-utils or brctl).
+
+
+###############################################################################
+# 3. SCENARIO CONFIGURATION FILE SYNTAX                                       #
+###############################################################################
+
+
+###############################################################################
+# 4. BUILDROOT MODE                                                           #
+###############################################################################
+
+
+###############################################################################
+# 5. LEGACY MODE                                                              #
+###############################################################################
+
+In short, don't use this mode unless you know what you are doing.
+
 ####### Requirements #######
 
 - QEMU
