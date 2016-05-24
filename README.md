@@ -98,12 +98,16 @@ Once you have run up.sh, you can access VM $K using
 
 where $K is a positive integer which identifies the VM.
 
-Each VMs runs in a minimal environment, which is an initramfs created using the
-buildroot framework (https://buildroot.org/). All the IRATI software and its
-dependencies are packed in less than 30 MB.
+Each VMs runs in a minimal environment, which is an RAM filesystem (initramfs)
+created using the buildroot framework (https://buildroot.org/). All the IRATI
+software and its dependencies (except for the kernel image) are packed in about
+30 MB.
 
-Any modifications done on the VM filesystem is discarded when the scenario is
-torn down.
+A snapshot of both the kernel image and the file system the are available in
+the buildroot directory of this repository.
+
+Be aware that any modifications done on the VM filesystem are discarded when
+the scenario is torn down.
 
 
 ###############################################################################
@@ -112,14 +116,24 @@ torn down.
 
 In short, don't use this mode unless you know what you are doing.
 
+When using legacy mode, you are not using the buildroot-generated kernel and
+filesystem, already available in the repository. Instead, you have build your
+own VM disk image, which must contain the IRATI kernel and user-space software.
+
+The disadvantage of this approach is that it is hard to build such an image
+using less than 4 GB. See section 4 for a better approach.
+
 In addition to the requirements specified in section 2, you need a QEMU VM
 image containing:
-    - the IRATI stack installed
-    - python
-    - sudo enabled for the login username on the VM (referred to as
-      ${username} in the following), with NOPASSWD, e.g. /etc/sudoers
-      should contain something similar to the following line:
-            %wheel ALL=(ALL) NOPASSWD: ALL
+
+* The IRATI stack installed
+* The bootloader configured to boot the IRATI kernel
+* Python
+* sudo enabled for the login username on the VM (referred to as ${username}
+  in the following), with NOPASSWD, e.g. /etc/sudoers should contain something
+  similar to the following line:
+
+    % wheel ALL=(ALL) NOPASSWD: ALL
 
 
 Instructions, to be followed in the specified order:
@@ -159,7 +173,7 @@ again (during the tests):
     $ ./update_vm.sh
     $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
     $ ssh-copy-id -p2222 ${username}@localhost
-    shutdown the VM
+    $ shutdown the VM
 
 [http://serverfault.com/questions/241588/how-to-automate-ssh-login-with-password]
 
