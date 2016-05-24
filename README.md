@@ -231,6 +231,44 @@ Be aware that any modifications done on the VM filesystem are discarded when
 the scenario is torn down.
 
 
+### 5.1 IRATI mini-tutorial
+
+This document is *not* a tutorial on how to use the IRATI stack. However, this
+section describes some basic tests you can do in order to check that things
+are working as they are supposed to work.
+
+Generate a simple three-node scenario, with two Shim DIFs over 802.1q and one
+normal DIF laying over those:
+
+	$ ./gen.py -c gen.conf
+
+Run the up.sh script to boostrap the scenario
+
+	$ ./up.sh
+
+waiting for it to finish (it may take tens of seconds).
+
+Access node "a" and run rina-echo-time in server ping mode
+
+	$ ./access.sh a
+	# rina-echo-time -l
+
+Using a different terminal, access node "c" and run rina-echo-time in client
+ping mode, sending 10 packets to the server.
+
+	$ ./access.sh c
+	# rina-echo-time -c 10
+
+Once the experiment terminates, use CTRL-C to stop the rina-echo-time server,
+and issue the "exit" command on both terminals to exit from the nodes.
+
+Run the down.sh script to tear down the scenario
+
+	$ ./down.sh
+
+That's it, you successfully ran a ping application in the RINA world!
+
+
 ###############################################################################
 ## 6. LEGACY MODE                                                             #
 ###############################################################################
