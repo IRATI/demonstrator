@@ -118,7 +118,7 @@ The repository contains some example of scenario configuration files:
 
 	gen.conf, gen1.conf, gen2.conf, gen3.conf, gen4.conf
 
-with some comments explaining the respective configuration.
+with comments explaining the respective configuration.
 
 ### 4.1 **eth** declarations
 
@@ -132,7 +132,7 @@ Each L2 domain is identified by a different VLAN number, which will be used
 by the IRATI stack as a name for the Shim DIFs over 802.1q, and that will be
 used to configure the VLAN on the nodes' interfaces.
 
-Syntax for the **eth** declaration:
+The syntax for the **eth** declaration is as follows:
 
     eth VLAN_ID LINK_SPEED NODE_NAME...
 
@@ -147,6 +147,31 @@ where
 
 * NODE\_NAME is an identifier for a node, which can by any non-space character.
   Two or more node can be specified, separated by spaces.
+
+
+### 4.2 **dif** declarations
+
+A **dif** declaration is gives information about how a single node partecipates
+in a specific N-DIF. It is used to specify what N-1 (lower) DIFs are used by the
+node to partecipate in the N-DIF.
+
+Consequently, for each normal DIF there will be a separate **dif** declaration
+for each node taking part in that DIF.
+
+The syntax for the **dif** declaration is as follows:
+
+	dif DIF_NAME NODE_NAME LOWER_DIF_NAME...
+
+where
+
+* DIF\_NAME is the name of the N-DIF under specification.
+
+* NODE\_NAME is the name of the node that takes part in DIF\_NAME.
+
+* LOWER\_DIF\_NAME is the name of an N-1-DIF (either Shim or normal) which is
+  used by NODE\_NAME to connect to its neighbors in the N-DIF. One or more
+  N-1-DIFs can be specified, separated by space. Having more N-1-DIFs usually
+  happens when a node has multiple neighbors.
 
 
 ###############################################################################
