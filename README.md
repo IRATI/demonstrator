@@ -1,5 +1,5 @@
 ###############################################################################
-# 1. OVERVIEW                                                                 #
+## 1. OVERVIEW                                                                #
 ###############################################################################
 
 This repository contains a command-line tool (gen.py) which allows the user to
@@ -31,7 +31,7 @@ The syntax of the configuration file is detailed in section 4.
 
 
 ###############################################################################
-# 2. WORKFLOW                                                                 #
+## 2. WORKFLOW                                                                #
 ###############################################################################
 
 Once the configuration file has been prepared, the user can invoke the tool
@@ -81,7 +81,7 @@ memory more, to achieve higher density.
 
 
 ###############################################################################
-# 3. HARDWARE AND SOFTWARE REQUIREMENTS                                       #
+## 3. HARDWARE AND SOFTWARE REQUIREMENTS                                      #
 ###############################################################################
 
 * [HW] An x86\_64 processor with hardware-assisted virtualization support (e.g.
@@ -96,7 +96,7 @@ memory more, to achieve higher density.
 
 
 ###############################################################################
-# 4. SCENARIO CONFIGURATION FILE SYNTAX                                       #
+## 4. SCENARIO CONFIGURATION FILE SYNTAX                                      #
 ###############################################################################
 
 The configuration file for gen.py contains a list of declarations, with one
@@ -120,7 +120,7 @@ The repository contains some example of scenario configuration files:
 
 with some comments explaining the respective configuration.
 
-## 4.1 **eth** declarations
+### 4.1 **eth** declarations
 
 An **eth** declaration is used to specify an L2 (Ethernet) connection between
 two or more nodes. A star topology - one with a central L2 switch - is used
@@ -150,7 +150,7 @@ where
 
 
 ###############################################################################
-# 5. BUILDROOT MODE                                                           #
+## 5. BUILDROOT MODE                                                          #
 ###############################################################################
 
 When using the tool in buildroot (default) mode, things are straightforward.
@@ -174,7 +174,7 @@ the scenario is torn down.
 
 
 ###############################################################################
-# 6. LEGACY MODE                                                              #
+## 6. LEGACY MODE                                                             #
 ###############################################################################
 
 In short, don't use this mode unless you know what you are doing.
@@ -199,7 +199,7 @@ image containing:
     % wheel ALL=(ALL) NOPASSWD: ALL
 
 
-Instructions, to be followed in the specified order:
+### 6.1 Instructions, to be followed in the specified order
 
 1. Edit the gen.env file to set the IRATI installation path (on the VM
    filesystem), the path of the QEMU VM image (on your physical machine
@@ -229,6 +229,8 @@ Don't try to run ./update\_vm.sh while the test is running (i.e. you've run
 ./up.sh but still not run ./down.sh).
 
 
+### 6.2 Automatic login to the VMs
+
 In order to automatically login to the VMs, it's highly recommended to use SSH
 keys. In this way it is possible to avoid inserting the password again and
 again (during the tests):
@@ -244,7 +246,7 @@ Now you should be able to run ./up.sh without the need to insert the password
 
 
 ###############################################################################
-# 7. CREDITS                                                                  #
+## 7. CREDITS                                                                 #
 ###############################################################################
 
 This tool has been developed on behalf of FP7 PRISTINE and H2020 ARCIFIRE EU
