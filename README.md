@@ -3,7 +3,7 @@
 ###############################################################################
 
 This repository contains a command-line tool (gen.py) which allows the user to
-easily try and test the IRATI in a multi-node scenario.
+easily try and test the IRATI stack in a multi-node scenario.
 
 The purpose of the tool is twofold:
 
