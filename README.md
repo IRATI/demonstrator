@@ -28,16 +28,16 @@ which will generate two bash scripts: up.sh and down.sh.
 Running the up.sh script will bootstrap the specified scenario, which involves
 the following operations:
 
-    - Create TAP interfaces and linux software-bridges to emulate the
-      specified L2 topology.
+* Create TAP interfaces and linux software-bridges to emulate the
+  specified L2 topology.
 
-    - Run the VMs emulating the nodes.
+* Run the VMs emulating the nodes.
 
-    - Bootstrap the IRATI stack on each node, with proper configuration
-      (IPCM configuration, DIF templates, DIF Allocator map, ...)
+* Bootstrap the IRATI stack on each node, with proper configuration
+  (IPCM configuration, DIF templates, DIF Allocator map, ...)
 
-    - Perform all the enrollment, at all DIF layers, respecting the
-      dependency order.
+* Perform all the enrollment, at all DIF layers, respecting the
+  dependency order.
 
 The up.sh script reports verbose information about ongoing operations. If
 everything goes well, you should be able to see the script reporting about
@@ -69,15 +69,15 @@ memory more, to achieve higher density.
 # 2. HARDWARE AND SOFTWARE REQUIREMENTS                                       #
 ###############################################################################
 
-  - [HW] An x86\_64 processor with hardware-assisted virtualization support (e.g.
-    Intel VT-X or AMD-V)
+* [HW] An x86\_64 processor with hardware-assisted virtualization support (e.g.
+  Intel VT-X or AMD-V)
 
-  - [SW] Linux-based Operating System.
+* [SW] Linux-based Operating System.
 
-  - [SW] QEMU, a fast and portable machine emulator.
+* [SW] QEMU, a fast and portable machine emulator.
 
-  - [SW] brctl command-lilne tool (usually found in a distro package called
-    bridge-utils or brctl).
+* [SW] brctl command-lilne tool (usually found in a distro package called
+  bridge-utils or brctl).
 
 
 ###############################################################################
@@ -124,42 +124,42 @@ image containing:
 
 Instructions, to be followed in the specified order:
 
-(1) Edit the gen.env file to set the IRATI installation path (on the VM
-    filesystem), the path of the QEMU VM image (on your physical machine
-    file system) and the login username on the VM (${username})
+1. Edit the gen.env file to set the IRATI installation path (on the VM
+   filesystem), the path of the QEMU VM image (on your physical machine
+   file system) and the login username on the VM (${username})
 
-(2) Specify the desired topology in gen.conf
+2. Specify the desired topology in gen.conf
 
-(3) Run ./gen.py to generate bootstrap and teardown script for the
-    topology specified in (2)
+3. Run ./gen.py to generate bootstrap and teardown script for the
+  topology specified in (2)
 
-(4) Use ./up.sh to bootstrap the scenario
+4. Use ./up.sh to bootstrap the scenario
 
-(5) VMs are accessible at localhost ports 2223, 2224, 2225, etc.
-	e.g. ssh -p2223 ${username}@localhost
+5. VMs are accessible at localhost ports 2223, 2224, 2225, etc.
+   e.g. ssh -p2223 ${username}@localhost
 
-(6) Perform your tests on the VMs using ssh (5)
+6. Perform your tests on the VMs using ssh (5)
 
-(7) Shutdown the scenario (destroying the VMs) using ./down.sh
+7. Shutdown the scenario (destroying the VMs) using ./down.sh
 
-(8) VMs launched by ./up.sh have a non-persistent disk --> modifications
-     will be lost at shutdown time (7).
-     To make persistent modifications to the VM image (e.g. to update PRISTINE
-     software), run ./update_vm.sh and access the VM at
-          ssh -p2222 ${username}@localhost
+8. VMs launched by ./up.sh have a non-persistent disk --> modifications
+   will be lost at shutdown time (7).
+   To make persistent modifications to the VM image (e.g. to update PRISTINE
+   software), run ./update\_vm.sh and access the VM at
+        ssh -p2222 ${username}@localhost
 
-     Don't try to run ./update_vm.sh while the test is running (i.e. you've run
-     ./up.sh but still not run ./down.sh).
+Don't try to run ./update\_vm.sh while the test is running (i.e. you've run
+./up.sh but still not run ./down.sh).
 
 
 In order to automatically login to the VMs, it's highly recommended to use SSH
 keys. In this way it is possible to avoid inserting the password again and
 again (during the tests):
 
-    (a.1) $ ./update_vm.sh
-    (a.2) $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
-    (a.3) $ ssh-copy-id -p2222 ${username}@localhost
-    (a.4) shutdown the VM
+    $ ./update_vm.sh
+    $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
+    $ ssh-copy-id -p2222 ${username}@localhost
+    shutdown the VM
 
 [http://serverfault.com/questions/241588/how-to-automate-ssh-login-with-password]
 
@@ -174,7 +174,7 @@ This tool has been developed on behalf of FP7 PRISTINE and H2020 ARCIFIRE EU
 projects.
 
 Author:
-    - Vincenzo Maffione <v DOT maffione AT nextworks DOT it>
+* Vincenzo Maffione <v DOT maffione AT nextworks DOT it>
 
 Contributors:
-    - None yet :)
+* None yet :)
