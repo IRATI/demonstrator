@@ -160,8 +160,8 @@ where
 
 ### 4.2 **dif** declarations
 
-A **dif** declaration is gives information about how a single node partecipates
-in a specific N-DIF. It is used to specify what N-1 (lower) DIFs are used by the
+A **dif** declaration gives information about how a single node partecipates in
+a specific N-DIF. It is used to specify what N-1 (lower) DIFs are used by the
 node to partecipate in the N-DIF.
 
 Consequently, for each normal DIF there will be a separate **dif** declaration
@@ -181,6 +181,32 @@ where
   used by NODE\_NAME to connect to its neighbors in the N-DIF. One or more
   N-1-DIFs can be specified, separated by space. Having more N-1-DIFs usually
   happens when a node has multiple neighbors.
+
+
+### 4.3 **policy** declarations
+
+A **policy** declaration is used to instruct the the tool to setup a particular
+non-default policy-set for a single IRATI component in a specific DIF.
+
+Consequently, for each normal DIF there will be a separate **policy**
+declaration for each IRATI DIF component that needs a non-default policy-set.
+
+The syntax for the **policy** declaration is as follows:
+
+	policy DIF_NAME COMPONENT_PATH POLICY_SET_NAME
+
+where
+
+* DIF\_NAME is the name of the DIF under specification.
+
+* COMPONENT\_PATH is a string identifying the DIF component under
+  specification. The string syntax is the same one used by the PRISTINE SDK
+  to identify components (e.g. "rmt.pff" to indicate the PDU Forwarding
+  Function component).
+
+* POLICY\_SET\_NAME is the name of a policy set to use for the specified
+  component in the specified DIF. The name must correspond to the one declared
+  in some plugin's manifest file.
 
 
 ###############################################################################
