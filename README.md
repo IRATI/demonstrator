@@ -3,8 +3,17 @@
 ###############################################################################
 
 This repository contains a command-line tool (gen.py) which allows the user to
-try and test the IRATI in a multi-node scenario with the minimum possible
-effort.
+easily try and test the IRATI in a multi-node scenario.
+
+The purpose of the tool is twofold:
+
+* Allow people interested in RINA to experience with a IRATI stack
+* Help IRATI developers and software release engineers to carry out integration
+  and regression tests
+
+For the first kind of users, no knoweledge about how to compile and install
+IRATI is required. Everything the user need is self-contained in this
+repository and is explained in this document.
 
 Each node is emulated using a light Virtual Machine (VM), run under the control
 of the QEMU hypervisor. All the VMs are run locally without any risk for your
@@ -14,8 +23,9 @@ All the user has to do is to prepare a configuration file which describes the
 scenario to be demonstrated. This requires the user to specify all the Layer 2
 connections between the nodes and all the DIFs which lay over this L2 topology.
 A DIF can be stacked over other DIFs, and arbitrary level of recursion is
-virtually supported by the tool (Be aware that the IRATI stack may place
-restrictions on the recursion depth, so the scenario bootstrap may fail).
+virtually supported by the tool (be aware that the IRATI stack may place
+restrictions on the recursion depth, so the scenario bootstrap may fail if
+you use too many levels of recursion).
 
 The syntax of the configuration file is detailed in section 3.
 
@@ -95,7 +105,7 @@ There are three types of declarations:
 * dif, to specify how normal DIFs stack onto each other
 * policy, to specify non-default policies for normal DIFs
 
-Each type declaration may occur many times
+Each type of declaration may occur many times.
 
 The repository contains some example of scenario configuration files:
 
