@@ -650,6 +650,14 @@ for dif in difs:
     # Dump the normal DIF configuration files
     dict_dump_json('normal.%s.dif' % (dif,), difconfs[dif], env_dict)
 
+
+# Dump the mapping from nodes to SSH ports
+fout = open('gen.map', 'w')
+for vmname in sorted(vms):
+    fout.write('%s %d\n' % (vmname, env_dict['baseport'] + vms[vmname]['id']))
+fout.close()
+
+
 if args.graphviz:
     try:
         import pydot
