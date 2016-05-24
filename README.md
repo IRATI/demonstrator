@@ -29,6 +29,15 @@ you use too many levels of recursion).
 
 The syntax of the configuration file is detailed in section 4.
 
+Using the -g option, the tool is able to generate an image depicting the graph
+of all normal DIFs, showing the lower-level DIFs connecting them.
+
+Run
+
+	$ ./gen.py -h
+
+to see all the available options.
+
 
 ###############################################################################
 ## 2. WORKFLOW                                                                #
