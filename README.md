@@ -249,11 +249,11 @@ Now you should be able to run ./up.sh without the need to insert the password
 ## 7. CREDITS                                                                 #
 ###############################################################################
 
-This tool has been developed on behalf of FP7 PRISTINE and H2020 ARCIFIRE EU
-projects.
+This tool has been developed on behalf of FP7 PRISTINE and H2020 ARCIFIRE
+EU-funded projects.
 
 Author:
-* Vincenzo Maffione <v DOT maffione AT nextworks DOT it>
+* Vincenzo Maffione, v DOT maffione AT nextworks DOT it
 
 Contributors:
 * None yet :)
