@@ -7,9 +7,10 @@ easily try and test the IRATI stack in a multi-node scenario.
 
 The purpose of the tool is twofold:
 
-* Allow people interested in RINA to experience with a IRATI stack
+* Allow people interested in RINA to trial the IRATI stack, which includes the
+  PRISTINE Software Development Kit;
 * Help IRATI developers and software release engineers to carry out integration
-  and regression tests
+  and regression tests;
 
 For the first kind of users, no knoweledge about how to compile and install
 IRATI is required. Everything the user need is self-contained in this
@@ -22,7 +23,7 @@ PC, so you don't need a dedicated machine or multiple physical machines.
 All the user has to do is to prepare a configuration file which describes the
 scenario to be demonstrated. This requires the user to specify all the Layer 2
 connections between the nodes and all the DIFs which lay over this L2 topology.
-A DIF can be stacked over other DIFs, and arbitrary level of recursion is
+A DIF can be stacked over other DIFs, and arbitrary levels of recursion is
 virtually supported by the tool (be aware that the IRATI stack may place
 restrictions on the recursion depth, so the scenario bootstrap may fail if
 you use too many levels of recursion).
