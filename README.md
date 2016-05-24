@@ -1,5 +1,5 @@
 ###############################################################################
-# 1. INTRODUCTION                                                             #
+# 1. OVERVIEW                                                                 #
 ###############################################################################
 
 This repository contains a command-line tool (gen.py) which allows the user to
@@ -27,7 +27,12 @@ virtually supported by the tool (be aware that the IRATI stack may place
 restrictions on the recursion depth, so the scenario bootstrap may fail if
 you use too many levels of recursion).
 
-The syntax of the configuration file is detailed in section 3.
+The syntax of the configuration file is detailed in section 4.
+
+
+###############################################################################
+# 2. WORKFLOW                                                                 #
+###############################################################################
 
 Once the configuration file has been prepared, the user can invoke the tool
 
@@ -60,7 +65,7 @@ between the nodes).
 The tool can work in two different modes: buildroot (default) and legacy. The
 way you access the nodes depends on the modes. In any case, unless you know
 what you are doing, you want to use the default buildroot mode. More
-information about the legacy mode can be found in section 5.
+information about the legacy mode can be found in section 6.
 
 To undo the operations carried out by the up.sh, the user can run the down.sh
 script. Once the latter script terminates, all the VMs have been terminated.
@@ -76,7 +81,7 @@ memory more, to achieve higher density.
 
 
 ###############################################################################
-# 2. HARDWARE AND SOFTWARE REQUIREMENTS                                       #
+# 3. HARDWARE AND SOFTWARE REQUIREMENTS                                       #
 ###############################################################################
 
 * [HW] An x86\_64 processor with hardware-assisted virtualization support (e.g.
@@ -91,7 +96,7 @@ memory more, to achieve higher density.
 
 
 ###############################################################################
-# 3. SCENARIO CONFIGURATION FILE SYNTAX                                       #
+# 4. SCENARIO CONFIGURATION FILE SYNTAX                                       #
 ###############################################################################
 
 The configuration file for gen.py contains a list of declarations, with one
@@ -101,11 +106,13 @@ comments.
 
 There are three types of declarations:
 
-* eth, to specify Layer 2 connections between nodes
-* dif, to specify how normal DIFs stack onto each other
-* policy, to specify non-default policies for normal DIFs
+* **eth**, to specify Layer 2 connections between nodes;
+* **dif**, to specify how normal DIFs stack onto each other;
+* **policy**, to specify non-default policies for normal DIFs;
 
 Each type of declaration may occur many times.
+Note that nodes are implicitely declared by means of **eth** and **dif** lines:
+there don't have an separate explicit declaration type.
 
 The repository contains some example of scenario configuration files:
 
@@ -113,9 +120,37 @@ The repository contains some example of scenario configuration files:
 
 with some comments explaining the respective configuration.
 
+## 4.1 **eth** declarations
+
+An **eth** declaration is used to specify an L2 (Ethernet) connection between
+two or more nodes. A star topology - one with a central L2 switch - is used
+to connect together the specified nodes.
+Consequentely, each **eth** declaration corresponds to a separate Ethernet L2
+broadcast domain.
+
+Each L2 domain is identified by a different VLAN number, which will be used
+by the IRATI stack as a name for the Shim DIFs over 802.1q, and that will be
+used to configure the VLAN on the nodes' interfaces.
+
+Syntax for the **eth** declaration:
+
+    eth VLAN_ID LINK_SPEED NODE_NAME...
+
+where
+
+* VLAN\_ID is an integer between 1 and 4095, identifying the L2 domain.
+
+* LINK\_SPEED indicates the maximum speed for this L2 domain (e.g. 30Mbps,
+  500 Kbps, 1Gbps, ...), which is implemented by rate-limiting the TAP
+  interfaces, outside the VMs. If 0Mbps is specified, no rate-limiting is
+  used.
+
+* NODE\_NAME is an identifier for a node, which can by any non-space character.
+  Two or more node can be specified, separated by spaces.
+
 
 ###############################################################################
-# 4. BUILDROOT MODE                                                           #
+# 5. BUILDROOT MODE                                                           #
 ###############################################################################
 
 When using the tool in buildroot (default) mode, things are straightforward.
@@ -139,7 +174,7 @@ the scenario is torn down.
 
 
 ###############################################################################
-# 5. LEGACY MODE                                                              #
+# 6. LEGACY MODE                                                              #
 ###############################################################################
 
 In short, don't use this mode unless you know what you are doing.
@@ -149,9 +184,9 @@ filesystem, already available in the repository. Instead, you have build your
 own VM disk image, which must contain the IRATI kernel and user-space software.
 
 The disadvantage of this approach is that it is hard to build such an image
-using less than 4 GB. See section 4 for a better approach.
+using less than 4 GB. See section 5 for a better approach.
 
-In addition to the requirements specified in section 2, you need a QEMU VM
+In addition to the requirements specified in section 3, you need a QEMU VM
 image containing:
 
 * The IRATI stack installed
@@ -209,7 +244,7 @@ Now you should be able to run ./up.sh without the need to insert the password
 
 
 ###############################################################################
-# 6. CREDITS                                                                  #
+# 7. CREDITS                                                                  #
 ###############################################################################
 
 This tool has been developed on behalf of FP7 PRISTINE and H2020 ARCIFIRE EU
