@@ -84,13 +84,31 @@ memory more, to achieve higher density.
 # 3. SCENARIO CONFIGURATION FILE SYNTAX                                       #
 ###############################################################################
 
+The configuration file for gen.py contains a list of declarations, with one
+declaration per line.
+Lines starting with '#' are ignored by the tool so that they can be used for
+comments.
+
+There are three types of declarations:
+
+* eth, to specify Layer 2 connections between nodes
+* dif, to specify how normal DIFs stack onto each other
+* policy, to specify non-default policies for normal DIFs
+
+Each type declaration may occur many times
+
+The repository contains some example of scenario configuration files:
+
+	gen.conf, gen1.conf, gen2.conf, gen3.conf, gen4.conf
+
+with some comments explaining the respective configuration.
+
 
 ###############################################################################
 # 4. BUILDROOT MODE                                                           #
 ###############################################################################
 
-When in buildroot (default) mode everything is straightforward, so there is
-little to say.
+When using the tool in buildroot (default) mode, things are straightforward.
 
 Once you have run up.sh, you can access VM $K using
 
