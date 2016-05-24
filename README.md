@@ -215,16 +215,14 @@ where
 
 When using the tool in buildroot (default) mode, things are straightforward.
 
-Once you have run up.sh, you can access VM $K using
+Once you have run up.sh, you can access the node named "XYZ" using
 
-    $ ./access.sh $K
+    $ ./access.sh XYZ
 
-where $K is a positive integer which identifies the VM.
-
-Each VMs runs in a minimal environment, which is an RAM filesystem (initramfs)
-created using the buildroot framework (https://buildroot.org/). All the IRATI
-software and its dependencies (except for the kernel image) are packed in about
-30 MB.
+Each node runs in a minimal VM environment, which is an RAM filesystem
+(initramfs) created using the buildroot framework (https://buildroot.org/).
+All the IRATI software and its dependencies (except for the kernel image) are
+packed into about 30 MB.
 
 A snapshot of both the kernel image and the file system the are available in
 the buildroot directory of this repository.
