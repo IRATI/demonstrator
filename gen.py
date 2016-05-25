@@ -45,6 +45,10 @@ argparser.add_argument('--legacy', action='store_true',
 argparser.add_argument('-m', '--memory',
                        help = "Amount of memory in megabytes", type = int,
                        default = '128')
+argparser.add_argument('-e', '--enrollment-strategy',
+                       help = "Minimal uses a spanning tree of each DIF",
+                       type = str, choices = ['minimal', 'full-mesh'],
+                       default = 'minimal')
 args = argparser.parse_args()
 
 
@@ -287,20 +291,31 @@ for dif in difs:
                 if vm1 != vm2:
                     dif_graphs[dif][vm1].append((vm2, lower_dif))
 
-    # To generate the list of enrollments, we simulate one,
-    # using breadth-first trasversal.
-    enrolled = set([first])
-    frontier = set([first])
     enrollments[dif] = []
-    while len(frontier):
-        cur = frontier.pop()
-        for edge in dif_graphs[dif][cur]:
-            if edge[0] not in enrolled:
-                enrolled.add(edge[0])
-                enrollments[dif].append({'enrollee': edge[0],
-                                         'enroller': cur,
-                                         'lower_dif': edge[1]})
-                frontier.add(edge[0])
+    if args.enrollment_strategy == 'minimal':
+        # To generate the list of enrollments, we simulate one,
+        # using breadth-first trasversal.
+        enrolled = set([first])
+        frontier = set([first])
+        while len(frontier):
+            cur = frontier.pop()
+            for edge in dif_graphs[dif][cur]:
+                if edge[0] not in enrolled:
+                    enrolled.add(edge[0])
+                    enrollments[dif].append({'enrollee': edge[0],
+                                             'enroller': cur,
+                                             'lower_dif': edge[1]})
+                    frontier.add(edge[0])
+    elif args.enrollment_strategy == 'full-mesh':
+        for cur in dif_graphs[dif]:
+            for edge in dif_graphs[dif][cur]:
+                if cur < edge[0]:
+                    enrollments[dif].append({'enrollee': cur,
+                                             'enroller': edge[0],
+                                             'lower_dif': edge[1]})
+    else:
+        # This is a bug
+        assert(False)
 
     #print(neighsets)
     #print(dif_graphs[dif])
