@@ -126,7 +126,7 @@ there don't have an separate explicit declaration type.
 
 The repository contains some example of scenario configuration files:
 
-	gen.conf, gen1.conf, gen2.conf, gen3.conf, gen4.conf
+	gen.conf, examples/star.conf, examples/two-layers.conf, ...
 
 with comments explaining the respective configuration.
 
