@@ -49,6 +49,9 @@ argparser.add_argument('-e', '--enrollment-strategy',
                        help = "Minimal uses a spanning tree of each DIF",
                        type = str, choices = ['minimal', 'full-mesh'],
                        default = 'minimal')
+argparser.add_argument('--ring',
+                       help = "Use ring topology with variable number of nodes",
+                       type = int)
 args = argparser.parse_args()
 
 
@@ -116,6 +119,25 @@ if not args.legacy:
     env_dict['varpath'] = ''
     env_dict['username'] = 'root'
 
+
+# Possibly autogenerate ring topology
+if args.ring != None and args.ring > 0:
+    print("Ignoring %s, generating ring topology" % (args.conf,))
+    fout = open('ring.conf', 'w')
+    for i in range(args.ring):
+        i_next = i + 1
+        if i_next == args.ring:
+            i_next = 0
+        fout.write('eth %(vlan)s 0Mbps m%(i)s m%(inext)s\n' % \
+                    {'i': i+1, 'inext': i_next+1, 'vlan': i+1+100})
+    for i in range(args.ring):
+        i_prev = i - 1
+        if i_prev < 0:
+            i_prev = args.ring - 1
+        fout.write('dif n m%(i)s %(vlan)s %(vprev)s\n' % \
+                    {'i': i+1, 'vlan': i+1+100, 'vprev': i_prev+1+100})
+    fout.close()
+    args.conf = 'ring.conf'
 
 ############################# Parse gen.conf ##############################
 fin = open(args.conf, 'r')
