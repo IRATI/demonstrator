@@ -53,6 +53,12 @@ argparser.add_argument('-e', '--enrollment-strategy',
 argparser.add_argument('--ring',
                        help = "Use ring topology with variable number of nodes",
                        type = int)
+argparser.add_argument('--kernel',
+                       help = "custom kernel image for buildroot", type = str,
+                       default = 'buildroot/bzImage')
+argparser.add_argument('--initramfs',
+                       help = "custom initramfs image for buildroot", type = str,
+                       default = 'buildroot/rootfs.cpio')
 args = argparser.parse_args()
 
 
@@ -115,7 +121,7 @@ env_dict['varpath'] = env_dict['installpath']
 
 if not args.legacy:
     # overwrite vmimgpath, installpath, varpath, username
-    env_dict['vmimgpath'] = 'buildroot/rootfs.cpio'
+    env_dict['vmimgpath'] = args.initramfs
     env_dict['installpath'] = '/usr'
     env_dict['varpath'] = ''
     env_dict['username'] = 'root'
@@ -410,11 +416,11 @@ for vmname in sorted(vms):
 
     vars_dict = {'fwdp': fwdp, 'id': vmid, 'mac': mac,
                  'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc,
-                 'memory': args.memory}
+                 'memory': args.memory, 'kernel': args.kernel}
 
     outs += 'qemu-system-x86_64 '
     if not args.legacy:
-        outs += '-kernel buildroot/bzImage '                            \
+        outs += '-kernel %(kernel)s '                                   \
                 '-append "console=ttyS0" '                              \
                 '-initrd %(vmimgpath)s '                                \
                 '-nographic ' % vars_dict
