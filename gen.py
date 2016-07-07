@@ -464,8 +464,8 @@ for vmname in sorted(vms):
 for vmname in sorted(vms):
     vm = vms[vmname]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif normal.*.dif da.map '\
-                     '%(name)s.ipcm.conf ' % {'name': vm['name']}
+    gen_files_conf = 'shimeth.%(name)s.*.dif normal.%(name)s.*.dif da.map '\
+                     '%(name)s.ipcm.conf ' % {'name': vmname}
     gen_files_bin = 'enroll.py '
     if args.legacy:
         gen_files_bin += 'mac2ifname '
@@ -684,7 +684,7 @@ for dif in dif_ordering:
 
         ipcmconf["difConfigurations"].append({
                                 "name": "%s.DIF" % (dif,),
-                                "template": "normal.%s.dif" % (dif,)
+                                "template": "normal.%s.%s.dif" % (vmname, dif,)
                                 })
 
         difconf["knownIPCProcessAddresses"].append({
@@ -705,8 +705,9 @@ for vmname in vms:
     dict_dump_json('%s.ipcm.conf' % (vmname,), ipcmconfs[vmname], env_dict)
 
 for dif in difs:
-    # Dump the normal DIF configuration files
-    dict_dump_json('normal.%s.dif' % (dif,), difconfs[dif], env_dict)
+    for vmname in difs[dif]:
+        # Dump the normal DIF configuration files
+        dict_dump_json('normal.%s.%s.dif' % (vmname, dif,), difconfs[dif], env_dict)
 
 
 # Dump the mapping from nodes to SSH ports
