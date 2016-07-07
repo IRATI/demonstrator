@@ -66,7 +66,7 @@ normal_dif_base =  {
                     "name" : "default",
                     "version" : "0"
                 },
-                "initialATimer" : 300,
+                "initialATimer" : 0,
                 "dtcpPresent" : True,
                 "dtcpConfiguration" : {
                     "dtcpPolicySet" : {
@@ -79,8 +79,8 @@ normal_dif_base =  {
                         "rateBased" : False,
                         "windowBased" : True,
                         "windowBasedConfig" : {
-                            "maxClosedWindowQueueLength" : 50,
-                            "initialCredit" : 50
+                            "maxClosedWindowQueueLength" : 10,
+                            "initialCredit" : 200
                         }
                     }
                 }
@@ -96,7 +96,7 @@ normal_dif_base =  {
                     "name" : "default",
                     "version" : "0"
                 },
-                "initialATimer" : 300,
+                "initialATimer" : 0,
                 "dtcpPresent" : True,
                 "dtcpConfiguration" : {
                     "dtcpPolicySet" : {
@@ -113,8 +113,8 @@ normal_dif_base =  {
                         "rateBased" : False,
                         "windowBased" : True,
                         "windowBasedConfig" : {
-                            "maxClosedWindowQueueLength" : 50,
-                            "initialCredit" : 50
+                            "maxClosedWindowQueueLength" : 10,
+                            "initialCredit" : 200
                         }
                     }
                 }
@@ -159,10 +159,10 @@ normal_dif_base =  {
                 "value" : "120000"
             }, {
                 "name"  : "neighborsEnrollerPeriodInMs",
-                "value" : "30000"
+                "value" : "0"
             }, {
                 "name"  : "maxEnrollmentRetries",
-                "value" : "3"
+                "value" : "0"
             } ]
         }
      },
