@@ -1,7 +1,6 @@
 #!/bin/sh
 
-rm *.dif
-rm *.ipcm.conf
-rm *.map
-rm gen_templates.pyc
-rm difs.png
+rm *.dif &> /dev/null
+rm *.ipcm.conf &> /dev/null
+rm *.map &> /dev/null
+rm difs.png &> /dev/null
