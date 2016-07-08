@@ -59,6 +59,10 @@ argparser.add_argument('--kernel',
 argparser.add_argument('--initramfs',
                        help = "custom initramfs image for buildroot", type = str,
                        default = 'buildroot/rootfs.cpio')
+argparser.add_argument('-f', '--frontend',
+                       help = "Choose which emulated NIC the nodes will use",
+                       type = str, choices = ['virtio-net-pci', 'e1000'],
+                       default = 'virtio-net-pci')
 args = argparser.parse_args()
 
 
@@ -416,7 +420,8 @@ for vmname in sorted(vms):
 
     vars_dict = {'fwdp': fwdp, 'id': vmid, 'mac': mac,
                  'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc,
-                 'memory': args.memory, 'kernel': args.kernel}
+                 'memory': args.memory, 'kernel': args.kernel,
+                 'frontend': args.frontend}
 
     outs += 'qemu-system-x86_64 '
     if not args.legacy:
@@ -434,7 +439,7 @@ for vmname in sorted(vms):
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
             '-m %(memory)sM '                                           \
-            '-device e1000,mac=%(mac)s,netdev=mgmt '                    \
+            '-device %(frontend)s,mac=%(mac)s,netdev=mgmt '                    \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
@@ -448,9 +453,10 @@ for vmname in sorted(vms):
         port['mac'] = mac
 
         outs += ''                                                      \
-        '-device e1000,mac=%(mac)s,netdev=data%(idx)s '                 \
+        '-device %(frontend)s,mac=%(mac)s,netdev=data%(idx)s '                 \
         '-netdev tap,ifname=%(tap)s,id=data%(idx)s,script=no,downscript=no '\
-            % {'mac': mac, 'tap': tap, 'idx': port['idx']}
+            % {'mac': mac, 'tap': tap, 'idx': port['idx'],
+               'frontend': args.frontend}
 
     outs += '&\n\n'
 
