@@ -65,6 +65,8 @@ argparser.add_argument('-f', '--frontend',
                        default = 'virtio-net-pci')
 argparser.add_argument('--vhost', action='store_true',
                        help = "Use vhost acceleration for virtio-net frontend")
+argparser.add_argument('--management-lan', action='store_true',
+                       help = "Add management LAN")
 args = argparser.parse_args()
 
 
@@ -152,6 +154,8 @@ if args.ring != None and args.ring > 0:
     fout.close()
     args.conf = 'ring.conf'
 
+injected_lines = []
+
 ############################# Parse gen.conf ##############################
 fin = open(args.conf, 'r')
 
@@ -164,11 +168,26 @@ dif_policies = dict()
 dif_graphs = dict()
 
 linecnt = 0
+conf_injection = True
 
 while 1:
     line = fin.readline()
     if line == '':
-        break
+        # EOF, try to pick from injected lines
+        if len(injected_lines) > 0:
+            line = injected_lines.pop(0)
+
+    if line == '':
+        if not conf_injection:
+            # Injection already done, let's stop now
+            break
+        # Inject new lines and continue
+        conf_injection = False
+        if args.management_lan:
+            vm_list = [vmname for vmname in sorted(vms)]
+            injected_lines.append('eth 3456 0Mbps %s' % (' '.join(vm_list)))
+        continue
+
     linecnt += 1
 
     line = line.replace('\n', '')
