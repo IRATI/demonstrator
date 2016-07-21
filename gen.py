@@ -65,8 +65,8 @@ argparser.add_argument('-f', '--frontend',
                        default = 'virtio-net-pci')
 argparser.add_argument('--vhost', action='store_true',
                        help = "Use vhost acceleration for virtio-net frontend")
-argparser.add_argument('--management-lan', action='store_true',
-                       help = "Add management LAN")
+argparser.add_argument('--manager', action='store_true',
+                       help = "Add support for NMS manager and dedicated LAN")
 args = argparser.parse_args()
 
 
@@ -170,6 +170,9 @@ dif_graphs = dict()
 linecnt = 0
 conf_injection = True
 
+mgmt_shim_dif_name = '3456'
+mgmt_dif_name = 'NMS'
+
 while 1:
     line = fin.readline()
     if line == '':
@@ -183,9 +186,11 @@ while 1:
             break
         # Inject new lines and continue
         conf_injection = False
-        if args.management_lan:
+        if args.manager:
             vm_list = [vmname for vmname in sorted(vms)]
-            injected_lines.append('eth 3456 0Mbps %s' % (' '.join(vm_list)))
+            injected_lines.append('eth %s 0Mbps %s' % (mgmt_shim_dif_name, ' '.join(vm_list)))
+            for vmname in sorted(vms):
+                injected_lines.append('dif %s %s %s' % (mgmt_dif_name, vmname, mgmt_shim_dif_name))
         continue
 
     linecnt += 1
@@ -645,8 +650,24 @@ if len(dif_ordering) > 0:
     for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
         adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
 
+if args.manager:
+    # Add MAD/Manager configuration
+    gen_templates.ipcmconf_base["addons"] = {
+                    "mad": {
+                            "managerAppName": "",
+                            "NMSDIFs" : [{"DIF" : "%s.DIF" % (mgmt_dif_name)}],
+                            "managerConnections" : [ {
+                                        "managerAppName" : "manager-1--",
+                                        "DIF": "%s.DIF" % (mgmt_dif_name)
+                                    }
+                                ]
+                    }
+                }
+
 for vmname in vms:
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
+    if args.manager:
+        ipcmconfs[vmname]["addons"]["mad"]["managerAppName"] = "%s.mad-1--" % (vmname)
 
 difconfs = dict()
 for dif in difs:
