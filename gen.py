@@ -801,8 +801,21 @@ if args.graphviz:
                     if vmname > neigh:
                         # Use lexicographical filter to avoid duplicate edges
                         continue
+
+                    color = 'black'
+                    # If enrollment is going to happen on this edge, color
+                    # it in red
+                    for enrollment in enrollments[dif]:
+                        if lower_dif == enrollment['lower_dif'] and \
+                                ((vmname == enrollment['enrollee'] and \
+                                neigh == enrollment['enroller']) or
+                                (vmname == enrollment['enroller'] and \
+                                neigh == enrollment['enrollee'])):
+                            color = 'red'
+                            break
+
                     edge = pydot.Edge(dif + vmname, dif + neigh,
-                                      label = lower_dif)
+                                      label = lower_dif, color = color)
                     gvizg.add_edge(edge)
 
             i += 1
