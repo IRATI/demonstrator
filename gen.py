@@ -154,7 +154,13 @@ if args.ring != None and args.ring > 0:
     fout.close()
     args.conf = 'ring.conf'
 
+
+# Some constants related to the RINA management
 injected_lines = []
+mgmt_shim_dif_name = '3456'
+mgmt_dif_name = 'NMS'
+mgmt_node_name = 'mgr'
+
 
 ############################# Parse gen.conf ##############################
 fin = open(args.conf, 'r')
@@ -169,9 +175,6 @@ dif_graphs = dict()
 
 linecnt = 0
 conf_injection = True
-
-mgmt_shim_dif_name = '3456'
-mgmt_dif_name = 'NMS'
 
 while 1:
     line = fin.readline()
@@ -188,8 +191,9 @@ while 1:
         conf_injection = False
         if args.manager:
             vm_list = [vmname for vmname in sorted(vms)]
+            vm_list.append(mgmt_node_name)  # a VM for the manager
             injected_lines.append('eth %s 0Mbps %s' % (mgmt_shim_dif_name, ' '.join(vm_list)))
-            for vmname in sorted(vms):
+            for vmname in vm_list:
                 injected_lines.append('dif %s %s %s' % (mgmt_dif_name, vmname, mgmt_shim_dif_name))
         continue
 
@@ -357,30 +361,40 @@ for dif in difs:
                     dif_graphs[dif][vm1].append((vm2, lower_dif))
 
     enrollments[dif] = []
-    if args.enrollment_strategy == 'minimal':
-        # To generate the list of enrollments, we simulate one,
-        # using breadth-first trasversal.
-        enrolled = set([first])
-        frontier = set([first])
-        while len(frontier):
-            cur = frontier.pop()
-            for edge in dif_graphs[dif][cur]:
-                if edge[0] not in enrolled:
-                    enrolled.add(edge[0])
-                    enrollments[dif].append({'enrollee': edge[0],
-                                             'enroller': cur,
-                                             'lower_dif': edge[1]})
-                    frontier.add(edge[0])
-    elif args.enrollment_strategy == 'full-mesh':
-        for cur in dif_graphs[dif]:
-            for edge in dif_graphs[dif][cur]:
-                if cur < edge[0]:
-                    enrollments[dif].append({'enrollee': cur,
-                                             'enroller': edge[0],
-                                             'lower_dif': edge[1]})
+
+    if args.manager and dif == mgmt_dif_name:
+        # Enrollment in the NMS DIF is managed as a special case:
+        # each node is enrolled against the manager node
+        for vmname in vms:
+            if vmname != mgmt_node_name:
+                enrollments[dif].append({'enrollee': vmname,
+                                         'enroller': mgmt_node_name,
+                                         'lower_dif': mgmt_shim_dif_name})
     else:
-        # This is a bug
-        assert(False)
+        if args.enrollment_strategy == 'minimal':
+            # To generate the list of enrollments, we simulate one,
+            # using breadth-first trasversal.
+            enrolled = set([first])
+            frontier = set([first])
+            while len(frontier):
+                cur = frontier.pop()
+                for edge in dif_graphs[dif][cur]:
+                    if edge[0] not in enrolled:
+                        enrolled.add(edge[0])
+                        enrollments[dif].append({'enrollee': edge[0],
+                                                 'enroller': cur,
+                                                 'lower_dif': edge[1]})
+                        frontier.add(edge[0])
+        elif args.enrollment_strategy == 'full-mesh':
+            for cur in dif_graphs[dif]:
+                for edge in dif_graphs[dif][cur]:
+                    if cur < edge[0]:
+                        enrollments[dif].append({'enrollee': cur,
+                                                 'enroller': edge[0],
+                                                 'lower_dif': edge[1]})
+        else:
+            # This is a bug
+            assert(False)
 
     #print(neighsets)
     #print(dif_graphs[dif])
