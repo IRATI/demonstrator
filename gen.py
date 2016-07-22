@@ -806,11 +806,14 @@ if args.graphviz:
                     # If enrollment is going to happen on this edge, color
                     # it in red
                     for enrollment in enrollments[dif]:
-                        if lower_dif == enrollment['lower_dif'] and \
-                                ((vmname == enrollment['enrollee'] and \
-                                neigh == enrollment['enroller']) or
-                                (vmname == enrollment['enroller'] and \
-                                neigh == enrollment['enrollee'])):
+                        ee = enrollment['enrollee']
+                        er = enrollment['enroller']
+                        lo = enrollment['lower_dif']
+                        if lo.endswith(".DIF"):
+                            lo = lo[:-4]
+                        if lower_dif == lo and \
+                                ((vmname == ee and neigh == er) or \
+                                (vmname == er and neigh == ee)):
                             color = 'red'
                             break
 
