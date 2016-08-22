@@ -250,7 +250,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+([\w.-]+)\s+([\w-]+)', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)', line)
     if m:
         dif = m.group(1)
         path = m.group(2)

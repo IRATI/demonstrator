@@ -239,8 +239,17 @@ policy_translator = {
     'security-manager': lambda d, v: ps_set(d["securityManagerConfiguration"], "policySet", v),
     'routing': lambda d, v: ps_set(d["routingConfiguration"], "policySet", v),
     'resource-allocator.pduftg': lambda d, v: ps_set(d["resourceAllocatorConfiguration"], "policySet", v),
+    'efcp.*.dtcp': None,
+    'efcp.*.dtp': None,
 }
 
 def translate_policy(difconf, path, ps):
-    policy_translator[path](difconf, ps)
+    if path in ['efcp.*.dtcp', 'efcp.*.dtp']:
+        for i in range(len(difconf["qosCubes"])):
+            if path =='efcp.*.dtcp':
+                difconf["qosCubes"][i]["efcpPolicies"]["dtcpConfiguration"]["dtcpPolicySet"]["name"] = ps
+            else:
+                difconf["qosCubes"][i]["efcpPolicies"]["dtpPolicySet"]["name"] = ps
+    else:
+        policy_translator[path](difconf, ps)
 
