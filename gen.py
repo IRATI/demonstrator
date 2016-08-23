@@ -172,6 +172,7 @@ difs = dict()
 enrollments = dict()
 dif_policies = dict()
 dif_graphs = dict()
+app_mappings = []
 
 linecnt = 0
 conf_injection = True
@@ -202,6 +203,9 @@ while 1:
     line = line.replace('\n', '')
 
     if line.startswith('#'):
+        continue
+
+    if re.match(r'\s*$', line):
         continue
 
     m = re.match(r'\s*eth\s+(\d+)\s+(\d+)([GMK])bps\s+(\w.*)$', line)
@@ -263,8 +267,19 @@ while 1:
         if path not in gen_templates.policy_translator:
             print('Unknown component path "%s"' % path)
             quit(1)
+        continue
+
+    m = re.match(r'\s*appmap\s+(\w+)\s+([\w.]+)\s+(\d+)', line)
+    if m:
+        dif = m.group(1)
+        apname = m.group(2)
+        apinst = m.group(3)
+
+        app_mappings.append({'name': '%s-%s--' % (apname, apinst), 'dif' : dif})
 
         continue
+
+    print("Warning: line %d not recognized" % linecnt)
 
 fin.close()
 
@@ -658,11 +673,20 @@ subprocess.call(['chmod', '+x', 'down.sh'])
 ################## Generate IPCM/DIF configuration files ##################
 ipcmconfs = dict()
 
-if len(dif_ordering) > 0:
-    # Assume the applications are to be mapped in the DIF with the
-    # highest rank
-    for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
-        adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+# If some app directives were specified, use those to build da.map.
+# Otherwise, assume the standard applications are to be mapped in
+# the DIF with the highest rank.
+if len(app_mappings) == 0:
+    if len(dif_ordering) > 0:
+        for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
+            adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+else:
+    gen_templates.da_map_base["applicationToDIFMappings"] = []
+    for apm in app_mappings:
+        gen_templates.da_map_base["applicationToDIFMappings"].append({
+                                                    "encodedAppName": apm['name'],
+                                                    "difName": "%s.DIF" % (apm['dif'])
+                                            })
 
 if args.manager:
     # Add MAD/Manager configuration
