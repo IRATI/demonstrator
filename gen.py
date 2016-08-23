@@ -172,6 +172,7 @@ difs = dict()
 enrollments = dict()
 dif_policies = dict()
 dif_graphs = dict()
+apps = []
 
 linecnt = 0
 conf_injection = True
@@ -263,6 +264,14 @@ while 1:
         if path not in gen_templates.policy_translator:
             print('Unknown component path "%s"' % path)
             quit(1)
+
+    m = re.match(r'\s*app\s+([\w.]+)\s+(\d+)\s+(\w.*)$', line)
+    if m:
+        app = m.group(1)
+        inst = m.group(2)
+        dif = m.group(3)
+
+        apps.append({'name': app+'-'+inst+'--', 'dif' : dif})
 
         continue
 
@@ -658,11 +667,20 @@ subprocess.call(['chmod', '+x', 'down.sh'])
 ################## Generate IPCM/DIF configuration files ##################
 ipcmconfs = dict()
 
-if len(dif_ordering) > 0:
-    # Assume the applications are to be mapped in the DIF with the
-    # highest rank
-    for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
-        adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+# If apps was not specified, assume the applications are to be mapped in 
+# the DIF with the highest rank. In other case, dump configuration to da.map
+if not apps:
+    if len(dif_ordering) > 0:
+        for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
+            adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+else:
+    appt = copy.deepcopy(gen_templates.da_map_base["applicationToDIFMappings"][0])
+    del gen_templates.da_map_base["applicationToDIFMappings"][:]
+    for app in apps:
+        appentry = copy.deepcopy(appt)
+        appentry["encodedAppName"] = app['name']
+        appentry["difName"] = app['dif']
+        gen_templates.da_map_base["applicationToDIFMappings"].append(appentry)
 
 if args.manager:
     # Add MAD/Manager configuration
