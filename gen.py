@@ -254,16 +254,21 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+$)', line)
+    if not m:
+        m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)\s+([\w=\s]*)$', line)
     if m:
         dif = m.group(1)
         path = m.group(2)
         ps = m.group(3)
+        parms = list()
+        if len(m.groups()) > 3:
+            parms = m.group(4).split(' ')
 
         if dif not in dif_policies:
             dif_policies[dif] = []
 
-        dif_policies[dif].append({'path': path, 'ps': ps})
+        dif_policies[dif].append({'path': path, 'ps': ps, 'parms' : parms})
         if path not in gen_templates.policy_translator:
             print('Unknown component path "%s"' % path)
             quit(1)
@@ -780,7 +785,7 @@ for dif in dif_ordering:
                                 })
 
     for policy in dif_policies[dif]:
-        gen_templates.translate_policy(difconf, policy['path'], policy['ps'])
+        gen_templates.translate_policy(difconf, policy['path'], policy['ps'], policy['parms'])
 
 
 # Dump the DIF Allocator map

@@ -227,29 +227,38 @@ normal_dif_base =  {
     }
 }
 
-def ps_set(d, k, v):
+def ps_set(d, k, v, parms):
     d[k]["name"] = v
+    if len(parms) > 0:
+        d[k]["parameters"] = [ { 'name': p.split('=')[0], 'value': p.split('=')[1]} for p in parms ]
+
+def dtp_ps_set(d, v, parms):
+    for i in range(len(d["qosCubes"])):
+        ps_set(d["qosCubes"][i]["efcpPolicies"], "dtpPolicySet", v, parms)
+
+def dtcp_ps_set(d, v, parms):
+    for i in range(len(d["qosCubes"])):
+        ps_set(d["qosCubes"][i]["efcpPolicies"]["dtcpConfiguration"], "dtcpPolicySet", v, parms)
 
 policy_translator = {
-    'rmt.pff': lambda d, v: ps_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v),
-    'rmt': lambda d, v: ps_set(d["rmtConfiguration"], "policySet", v),
-    'enrollment-task': lambda d, v: ps_set(d["enrollmentTaskConfiguration"], "policySet", v),
-    'flow-allocator': lambda d, v: ps_set(d["flowAllocatorConfiguration"], "policySet", v),
-    'namespace-manager': lambda d, v: ps_set(d["namespaceManagerConfiguration"], "policySet", v),
-    'security-manager': lambda d, v: ps_set(d["securityManagerConfiguration"], "policySet", v),
-    'routing': lambda d, v: ps_set(d["routingConfiguration"], "policySet", v),
-    'resource-allocator.pduftg': lambda d, v: ps_set(d["resourceAllocatorConfiguration"], "policySet", v),
+    'rmt.pff': lambda d, v, p: ps_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v, p),
+    'rmt': lambda d, v, p: ps_set(d["rmtConfiguration"], "policySet", v, p),
+    'enrollment-task': lambda d, v, p: ps_set(d["enrollmentTaskConfiguration"], "policySet", v, p),
+    'flow-allocator': lambda d, v, p: ps_set(d["flowAllocatorConfiguration"], "policySet", v, p),
+    'namespace-manager': lambda d, v, p: ps_set(d["namespaceManagerConfiguration"], "policySet", v, p),
+    'security-manager': lambda d, v, p: ps_set(d["securityManagerConfiguration"], "policySet", v, p),
+    'routing': lambda d, v, p: ps_set(d["routingConfiguration"], "policySet", v, p),
+    'resource-allocator.pduftg': lambda d, v, p: ps_set(d["resourceAllocatorConfiguration"], "policySet", v, p),
     'efcp.*.dtcp': None,
     'efcp.*.dtp': None,
 }
 
-def translate_policy(difconf, path, ps):
+def translate_policy(difconf, path, ps, parms):
     if path in ['efcp.*.dtcp', 'efcp.*.dtp']:
-        for i in range(len(difconf["qosCubes"])):
-            if path =='efcp.*.dtcp':
-                difconf["qosCubes"][i]["efcpPolicies"]["dtcpConfiguration"]["dtcpPolicySet"]["name"] = ps
-            else:
-                difconf["qosCubes"][i]["efcpPolicies"]["dtpPolicySet"]["name"] = ps
+        if path =='efcp.*.dtcp':
+            dtcp_ps_set(difconf, ps, parms)
+        else:
+            dtp_ps_set(difconf, ps, parms)
     else:
-        policy_translator[path](difconf, ps)
+        policy_translator[path](difconf, ps, parms)
 
