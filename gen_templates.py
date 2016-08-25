@@ -228,9 +228,17 @@ normal_dif_base =  {
 }
 
 def ps_set(d, k, v, parms):
-    d[k]["name"] = v
     if len(parms) > 0:
-        d[k]["parameters"] = [ { 'name': p.split('=')[0], 'value': p.split('=')[1]} for p in parms ]
+        if d[k]["name"] == v and "parameters" in d[k]:
+            for p in parms:
+                pe = filter(lambda pd: pd['name'] == p.split('=')[0], d[k]["parameters"])
+                if len(pe) > 0:
+                    pe[0]['value'] = p.split('=')[1]
+                else:
+                    d[k]["parameters"].append({ 'name': p.split('=')[0], 'value': p.split('=')[1]})
+        else:
+            d[k]["parameters"] = [ { 'name': p.split('=')[0], 'value': p.split('=')[1]} for p in parms ]
+    d[k]["name"] = v
 
 def dtp_ps_set(d, v, parms):
     for i in range(len(d["qosCubes"])):
