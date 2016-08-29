@@ -254,16 +254,15 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+$)', line)
-    if not m:
-        m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)\s+([\w=\s]*)$', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)(?:\s+([\w=\s]*))?\s*$', line)
     if m:
         dif = m.group(1)
         path = m.group(2)
         ps = m.group(3)
-        parms = list()
-        if len(m.groups()) > 3:
+        if m.group(4) != None:
             parms = m.group(4).split(' ')
+        else:
+            parms = list()
 
         if dif not in dif_policies:
             dif_policies[dif] = []
