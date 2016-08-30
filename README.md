@@ -114,11 +114,12 @@ declaration per line.
 Lines starting with '#' are ignored by the tool so that they can be used for
 comments.
 
-There are three types of declarations:
+There are a few types of declarations:
 
 * **eth**, to specify Layer 2 connections between nodes;
 * **dif**, to specify how normal DIFs stack onto each other;
 * **policy**, to specify non-default policies for normal DIFs;
+* **appmap**, to specify static application-to-DIF mappings for normal DIFs;
 
 Each type of declaration may occur many times.
 Note that nodes are implicitely declared by means of **eth** and **dif** lines:
@@ -194,7 +195,7 @@ declaration for each IRATI DIF component that needs a non-default policy-set.
 
 The syntax for the **policy** declaration is as follows:
 
-	policy DIF_NAME COMPONENT_PATH POLICY_SET_NAME
+	policy DIF_NAME COMPONENT_PATH POLICY_SET_NAME [PARAM1=VALUE1 PARAM2=VALUE2 ...]
 
 where
 
@@ -208,6 +209,25 @@ where
 * POLICY\_SET\_NAME is the name of a policy set to use for the specified
   component in the specified DIF. The name must correspond to the one declared
   in some plugin's manifest file.
+
+* A list of name/values couples is used to specify policy-set parameters.
+
+
+### 4.4 **appmap** declarations
+
+An **appmap** declaration is used to specify a static mapping of an application
+name to a normal DIF. This static configuration is used by the DIF allocator
+during the flow allocation procedure.
+
+The syntax is as follows:
+
+        appmap DIF_NAME AP_NAME AP_INSTANCE
+
+where
+
+* DIF\_NAME is the name of the DIF that the applications name maps to
+* AP\_NAME is the application process name of the mapped application
+* AP\_INSTANCE is the application process instance of the mapped application
 
 
 ###############################################################################
@@ -355,4 +375,5 @@ Author:
 * Vincenzo Maffione, v DOT maffione AT nextworks DOT it
 
 Contributors:
-* None yet :)
+* Eduard Grasa, I2CAT
+* Leonardo Bergesio, I2CAT
