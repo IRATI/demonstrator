@@ -67,6 +67,9 @@ argparser.add_argument('--vhost', action='store_true',
                        help = "Use vhost acceleration for virtio-net frontend")
 argparser.add_argument('--manager', action='store_true',
                        help = "Add support for NMS manager and dedicated LAN")
+argparser.add_argument('--include-dir',
+                       help = "Copy specified directory in the created machines",
+                       type = str)
 args = argparser.parse_args()
 
 
@@ -532,14 +535,20 @@ for vmname in sorted(vms):
     gen_files_conf = 'shimeth.%(name)s.*.dif normal.%(name)s.*.dif da.map '\
                      '%(name)s.ipcm.conf ' % {'name': vmname}
     gen_files_bin = 'enroll.py '
+    gen_dir_inc = ' '
+
     if args.legacy:
         gen_files_bin += 'mac2ifname '
-    gen_files = gen_files_conf + gen_files_bin
+
+    if args.include_dir and os.path.isdir(args.include_dir) and os.listdir(args.include_dir) != []:
+        gen_dir_inc = args.include_dir
+
+    gen_files = gen_files_conf + gen_files_bin + gen_dir_inc
 
     outs += ''\
             'DONE=255\n'\
             'while [ $DONE != "0" ]; do\n'\
-            '   scp %(sshopts)s -P %(ssh)s %(genfiles)s %(username)s@localhost: \n'\
+            '   scp %(sshopts)s -r -P %(ssh)s %(genfiles)s %(username)s@localhost: \n'\
             '   DONE=$?\n'\
             '   if [ $DONE != "0" ]; then\n'\
             '       sleep 1\n'\
@@ -551,10 +560,12 @@ for vmname in sorted(vms):
                 '$SUDO hostname %(name)s\n'\
                 '\n'\
                 '$SUDO mv %(genfilesconf)s /etc\n'\
+                '$SUDO mv %(gendirinc)s /etc\n'\
                 '$SUDO mv %(genfilesbin)s /usr/bin\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
+                    'gendirinc': os.path.basename(gen_dir_inc),
                     'genfilesbin': gen_files_bin, 'vmname': vm['name'],
                     'sshopts': sshopts, 'sudo': sudo}
 
