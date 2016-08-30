@@ -228,16 +228,21 @@ normal_dif_base =  {
 }
 
 def ps_set(d, k, v, parms):
-    if len(parms) > 0:
-        if d[k]["name"] == v and "parameters" in d[k]:
-            for p in parms:
-                pe = filter(lambda pd: pd['name'] == p.split('=')[0], d[k]["parameters"])
-                if len(pe) > 0:
-                    pe[0]['value'] = p.split('=')[1]
-                else:
-                    d[k]["parameters"].append({ 'name': p.split('=')[0], 'value': p.split('=')[1]})
-        else:
-            d[k]["parameters"] = [ { 'name': p.split('=')[0], 'value': p.split('=')[1]} for p in parms ]
+    if d[k]["name"] == v and "parameters" in d[k]:
+        cur_names = [p["name"] for p in d[k]["parameters"]]
+        for p in parms:
+            name, value = p.split('=')
+            if name in cur_names:
+                for i in range(len(d[k]["parameters"])):
+                    if d[k]["parameters"][i]["name"] == name:
+                        d[k]["parameters"][i]["value"] = value
+                        break
+            else:
+                d[k]["parameters"].append({ 'name': name, 'value': value })
+
+    elif len(parms) > 0:
+        d[k]["parameters"] = [ { 'name': p.split('=')[0], 'value': p.split('=')[1]} for p in parms ]
+
     d[k]["name"] = v
 
 def dtp_ps_set(d, v, parms):
