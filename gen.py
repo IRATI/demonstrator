@@ -67,8 +67,8 @@ argparser.add_argument('--vhost', action='store_true',
                        help = "Use vhost acceleration for virtio-net frontend")
 argparser.add_argument('--manager', action='store_true',
                        help = "Add support for NMS manager and dedicated LAN")
-argparser.add_argument('--include-dir',
-                       help = "Copy specified directory in the created machines",
+argparser.add_argument('--overlay',
+                       help = "Overlay the specified directory in the generated image",
                        type = str)
 args = argparser.parse_args()
 
@@ -535,15 +535,15 @@ for vmname in sorted(vms):
     gen_files_conf = 'shimeth.%(name)s.*.dif normal.%(name)s.*.dif da.map '\
                      '%(name)s.ipcm.conf ' % {'name': vmname}
     gen_files_bin = 'enroll.py '
-    gen_dir_inc = ' '
+    overlay = ''
 
     if args.legacy:
         gen_files_bin += 'mac2ifname '
 
-    if args.include_dir and os.path.isdir(args.include_dir) and os.listdir(args.include_dir) != []:
-        gen_dir_inc = args.include_dir
+    if args.overlay and os.path.isdir(args.overlay) and os.listdir(args.overlay) != []:
+        overlay = args.overlay
 
-    gen_files = gen_files_conf + gen_files_bin + gen_dir_inc
+    gen_files = gen_files_conf + gen_files_bin + overlay
 
     outs += ''\
             'DONE=255\n'\
@@ -560,14 +560,16 @@ for vmname in sorted(vms):
                 '$SUDO hostname %(name)s\n'\
                 '\n'\
                 '$SUDO mv %(genfilesconf)s /etc\n'\
-                '$SUDO mv %(gendirinc)s /etc\n'\
                 '$SUDO mv %(genfilesbin)s /usr/bin\n'\
             '\n' % {'name': vm['name'], 'ssh': vm['ssh'], 'id': vm['id'],
                     'username': env_dict['username'],
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
-                    'gendirinc': os.path.basename(gen_dir_inc),
                     'genfilesbin': gen_files_bin, 'vmname': vm['name'],
                     'sshopts': sshopts, 'sudo': sudo}
+    if overlay != '':
+        outs += '$SUDO cp -r %(overlay)s/* /\n'\
+                '$SUDO rm -rf %(overlay)s\n'\
+                    % {'overlay': os.path.basename(overlay)}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
