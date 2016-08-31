@@ -532,8 +532,9 @@ for vmname in sorted(vms):
 for vmname in sorted(vms):
     vm = vms[vmname]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif normal.%(name)s.*.dif da.map '\
-                     '%(name)s.ipcm.conf ' % {'name': vmname}
+    gen_files_conf = 'shimeth.%(name)s.*.dif da.map %(name)s.ipcm.conf ' % {'name': vmname}
+    if any(vmname in difd for difd in difs.values()):
+        gen_files_conf += 'normal.%(name)s.*.dif ' % {'name': vmname}
     gen_files_bin = 'enroll.py '
     overlay = ''
 
