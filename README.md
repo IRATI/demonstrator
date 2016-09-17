@@ -121,7 +121,7 @@ There are a few types of declarations or directives:
 * **policy**, to specify non-default policies for normal DIFs;
 * **appmap**, to specify static application-to-DIF mappings for normal DIFs;
 * **overlay**, to specify a per-node directory to be overlaid on the node
-               file system
+               file system;
 
 Each type of declaration may occur many times.
 Note that nodes are implicitely declared by means of **eth** and **dif** lines:
@@ -236,6 +236,9 @@ where
 
 An **overlay** directive is used to specify a directory on the host file system
 to be overlaid on the file system of a specific node.
+This directive overrides the behaviour of the --overlay option, because the
+--overlay option is processed (i.e. the files copied on the node file system)
+before the directive is processed.
 
 The syntax is as follows:
 
