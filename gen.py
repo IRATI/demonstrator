@@ -31,6 +31,10 @@ def dict_dump_json(file_name, dictionary, env_dict):
     fout.close()
 
 
+def joincat(haystack, needle):
+    return ' '.join([needle, haystack])
+
+
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -176,6 +180,7 @@ enrollments = dict()
 dif_policies = dict()
 dif_graphs = dict()
 app_mappings = []
+overlays = dict()
 
 linecnt = 0
 conf_injection = True
@@ -283,6 +288,23 @@ while 1:
         apinst = m.group(3)
 
         app_mappings.append({'name': '%s-%s--' % (apname, apinst), 'dif' : dif})
+
+        continue
+
+    m = re.match(r'\s*overlay\s+(\w+)\s+([\w./]+)', line)
+    if m:
+        vmname = m.group(1)
+        opath = m.group(2)
+
+        if not os.path.isdir(opath):
+            print("Error: line %d: no such overlay path" % linecnt)
+            continue
+
+        if len(os.listdir(args.overlay)) == 0:
+            print("Warning: line %d: empty overlay" % linecnt)
+            continue
+
+        overlays[vmname] = opath
 
         continue
 
@@ -533,19 +555,23 @@ for vmname in sorted(vms):
 for vmname in sorted(vms):
     vm = vms[vmname]
 
-    gen_files_conf = 'shimeth.%(name)s.*.dif da.map %(name)s.ipcm.conf ' % {'name': vmname}
+    gen_files_conf = 'shimeth.%(name)s.*.dif da.map %(name)s.ipcm.conf' % {'name': vmname}
     if any(vmname in difs[difname] for difname in difs):
-        gen_files_conf += 'normal.%(name)s.*.dif ' % {'name': vmname}
-    gen_files_bin = 'enroll.py '
+        gen_files_conf = joincat(gen_files_conf, 'normal.%(name)s.*.dif' % {'name': vmname})
+    gen_files_bin = 'enroll.py'
     overlay = ''
+    per_vm_overlay = ''
 
     if args.legacy:
-        gen_files_bin += 'mac2ifname '
+        gen_files_bin = joincat(gen_files_bin, 'mac2ifname')
 
     if args.overlay and os.path.isdir(args.overlay) and os.listdir(args.overlay) != []:
         overlay = args.overlay
 
-    gen_files = gen_files_conf + gen_files_bin + overlay
+    if vmname in overlays:
+        per_vm_overlay = overlays[vmname]
+
+    gen_files = ' '.join([gen_files_conf, gen_files_bin, overlay, per_vm_overlay])
 
     outs += ''\
             'DONE=255\n'\
@@ -568,10 +594,12 @@ for vmname in sorted(vms):
                     'genfiles': gen_files, 'genfilesconf': gen_files_conf,
                     'genfilesbin': gen_files_bin, 'vmname': vm['name'],
                     'sshopts': sshopts, 'sudo': sudo}
-    if overlay != '':
-        outs += '$SUDO cp -r %(overlay)s/* /\n'\
-                '$SUDO rm -rf %(overlay)s\n'\
-                    % {'overlay': os.path.basename(overlay)}
+
+    for ov in [overlay, per_vm_overlay]:
+        if ov != '':
+            outs += '$SUDO cp -r %(ov)s/* /\n'\
+                    '$SUDO rm -rf %(ov)s\n'\
+                        % {'ov': os.path.basename(ov)}
 
     for port in vm['ports']:
         outs += 'PORT=$(mac2ifname %(mac)s)\n'\
