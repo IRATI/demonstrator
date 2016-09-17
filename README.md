@@ -114,12 +114,14 @@ declaration per line.
 Lines starting with '#' are ignored by the tool so that they can be used for
 comments.
 
-There are a few types of declarations:
+There are a few types of declarations or directives:
 
 * **eth**, to specify Layer 2 connections between nodes;
 * **dif**, to specify how normal DIFs stack onto each other;
 * **policy**, to specify non-default policies for normal DIFs;
 * **appmap**, to specify static application-to-DIF mappings for normal DIFs;
+* **overlay**, to specify a per-node directory to be overlaid on the node
+               file system
 
 Each type of declaration may occur many times.
 Note that nodes are implicitely declared by means of **eth** and **dif** lines:
@@ -228,6 +230,23 @@ where
 * DIF\_NAME is the name of the DIF that the applications name maps to
 * AP\_NAME is the application process name of the mapped application
 * AP\_INSTANCE is the application process instance of the mapped application
+
+
+### 4.5 **overlay** directive
+
+An **overlay** directive is used to specify a directory on the host file system
+to be overlaid on the file system of a specific node.
+
+The syntax is as follows:
+
+        overlay NODE_NAME OVERLAY
+
+where
+
+* NODE\_NAME is the name of the node to which the overlay applies
+* OVERLAY is the path (absolute or relative to the path of the demonstrator
+          command line tool) of the overlay directory tree on the host file
+          system
 
 
 ###############################################################################
