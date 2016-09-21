@@ -300,10 +300,6 @@ while 1:
             print("Error: line %d: no such overlay path" % linecnt)
             continue
 
-        if len(os.listdir(args.overlay)) == 0:
-            print("Warning: line %d: empty overlay" % linecnt)
-            continue
-
         overlays[vmname] = opath
 
         continue
