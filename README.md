@@ -122,6 +122,8 @@ There are a few types of declarations or directives:
 * **appmap**, to specify static application-to-DIF mappings for normal DIFs;
 * **overlay**, to specify a per-node directory to be overlaid on the node
                file system;
+* **netem**, to specify a per-node, per-shim-dif link emulation features
+             (delay, loss, duplicate packets, etc.)
 
 Each type of declaration may occur many times.
 Note that nodes are implicitely declared by means of **eth** and **dif** lines:
@@ -250,6 +252,28 @@ where
 * OVERLAY is the path (absolute or relative to the path of the demonstrator
           command line tool) of the overlay directory tree on the host file
           system
+
+
+### 4.6 **netem** directive
+
+An **netem** directive allows link emulation, using the *netem* features
+of the Linux traffic control framework. Any valid netem command can be
+used (e.g. see https://wiki.linuxfoundation.org/networking/netem).
+
+The syntax is as follows:
+
+        netem SHIM_NAME NODE_NAME NETEM_COMMAND
+
+where
+
+* SHIM\_NAME is the name of the Shim DIF where link emulation applies
+* NODE\_NAME is the name of the node for which the link must be emulated
+	     for the specified link
+
+Example to add a delay to node xyz in shim wan.DIF
+
+	netem wan.DIF xyz delay 100ms
+
 
 
 ###############################################################################
