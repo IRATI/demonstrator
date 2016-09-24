@@ -507,12 +507,13 @@ for l in sorted(links):
 
     if shims[shim]['speed'] > 0:
         speed = '%d%sbit' % (shims[shim]['speed'], shims[shim]['speed_unit'])
+        if shim not in netems:
+            netems[shim] = dict()
+        if vm not in netems[shim]:
+            netems[shim][vm] = {'args': '', 'linecnt': 0}
+
         # Rate limit the traffic transmitted on the TAP interface
-        outs += 'sudo tc qdisc add dev %(tap)s handle 1: root '     \
-                                'htb default 11\n'                  \
-                'sudo tc class add dev %(tap)s parent 1: classid ' \
-                                '1:11 htb rate %(speed)s\n'         \
-                % {'tap': tap, 'speed': speed}
+        netems[shim][vm]['args'] += ' rate %s' % (speed,)
 
     if shim in netems:
         if vm in netems[shim]:
