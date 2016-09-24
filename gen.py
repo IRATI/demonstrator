@@ -338,9 +338,7 @@ while 1:
 
         if dif not in netems:
             netems[dif] = dict()
-        if vmname not in netems[dif]:
-            netems[dif][vmname] = []
-        netems[dif][vmname].append({'args': netem_args, 'linecnt': linecnt})
+        netems[dif][vmname] = {'args': netem_args, 'linecnt': linecnt}
 
         continue
 
@@ -518,14 +516,13 @@ for l in sorted(links):
 
     if shim in netems:
         if vm in netems[shim]:
-            for ncmd in netems[shim][vm]:
-                if not netem_validate(ncmd['args']):
-                    print('Warning: line %(linecnt)s is invalid and '\
-                          'will be ignored' % ncmd)
-                    continue
-                outs += 'sudo tc qdisc add dev %(tap)s root netem '\
-                        '%(args)s\n'\
-                        % {'tap': tap, 'args': ncmd['args']}
+            if not netem_validate(netems[shim][vm]['args']):
+                print('Warning: line %(linecnt)s is invalid and '\
+                      'will be ignored' % netems[shim][vm])
+                continue
+            outs += 'sudo tc qdisc add dev %(tap)s root netem '\
+                    '%(args)s\n'\
+                    % {'tap': tap, 'args': netems[shim][vm]['args']}
 
     vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx,
                              'vlan': shim})
