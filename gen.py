@@ -35,6 +35,25 @@ def joincat(haystack, needle):
     return ' '.join([needle, haystack])
 
 
+def netem_validate(netem_args):
+    ret = True
+
+    try:
+        fdevnull = open(os.devnull, 'w')
+        subprocess.check_call('sudo ip tuntap add mode tap name tapiratiprobe'.split())
+        subprocess.check_call(('sudo tc qdisc add dev '\
+                               'tapiratiprobe root netem %s'\
+                                % netem_args).split(), stdout=fdevnull,
+                                stderr=fdevnull)
+        fdevnull.close()
+    except:
+        ret = False
+
+    subprocess.call('sudo ip tuntap del mode tap name tapiratiprobe'.split())
+
+    return ret
+
+
 description = "Python script to generate IRATI deployments for Virtual Machines"
 epilog = "2016 Vincenzo Maffione <v.maffione@nextworks.it>"
 
@@ -502,6 +521,10 @@ for l in sorted(links):
     if shim in netems:
         if vm in netems[shim]:
             for ncmd in netems[shim][vm]:
+                if not netem_validate(ncmd['args']):
+                    print('Warning: line %(linecnt)s is invalid and '\
+                          'will be ignored' % ncmd)
+                    continue
                 outs += 'sudo tc qdisc add dev %(tap)s root netem '\
                         '%(args)s\n'\
                         % {'tap': tap, 'args': ncmd['args']}
