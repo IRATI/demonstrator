@@ -185,6 +185,7 @@ dif_policies = dict()
 dif_graphs = dict()
 app_mappings = []
 overlays = dict()
+netems = dict()
 
 linecnt = 0
 conf_injection = True
@@ -307,6 +308,20 @@ while 1:
             continue
 
         overlays[vmname] = opath
+
+        continue
+
+    m = re.match(r'\s*netem\s+(\d+)\s+(\w+)\s+(\w.*)$', line)
+    if m:
+        dif = m.group(1)
+        vmname = m.group(2)
+        netem_args = m.group(3)
+
+        if dif not in netems:
+            netems[dif] = dict()
+        if vmname not in netems[dif]:
+            netems[dif][vmname] = []
+        netems[dif][vmname].append({'args': netem_args, 'linecnt': linecnt})
 
         continue
 
@@ -483,6 +498,13 @@ for l in sorted(links):
                 'sudo tc class add dev %(tap)s parent 1:1 classid ' \
                                 '1:11 htb rate %(speed)s\n'         \
                 % {'tap': tap, 'speed': speed}
+
+    if shim in netems:
+        if vm in netems[shim]:
+            for ncmd in netems[shim][vm]:
+                outs += 'sudo tc qdisc add dev %(tap)s root netem '\
+                        '%(args)s\n'\
+                        % {'tap': tap, 'args': ncmd['args']}
 
     vms[vm]['ports'].append({'tap': tap, 'br': b, 'idx': idx,
                              'vlan': shim})
