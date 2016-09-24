@@ -82,6 +82,10 @@ which('qemu-system-x86_64')
 
 subprocess.call(['chmod', '0400', 'buildroot/irati_rsa'])
 
+if args.overlay:
+    args.overlay = os.path.abspath(args.overlay)
+    if not os.path.isdir(args.overlay):
+        args.overlay = None
 
 if args.legacy:
     sshopts = ''
@@ -295,6 +299,8 @@ while 1:
     if m:
         vmname = m.group(1)
         opath = m.group(2)
+
+        opath = os.path.abspath(opath)
 
         if not os.path.isdir(opath):
             print("Error: line %d: no such overlay path" % linecnt)
@@ -561,7 +567,7 @@ for vmname in sorted(vms):
     if args.legacy:
         gen_files_bin = joincat(gen_files_bin, 'mac2ifname')
 
-    if args.overlay and os.path.isdir(args.overlay) and os.listdir(args.overlay) != []:
+    if args.overlay:
         overlay = args.overlay
 
     if vmname in overlays:
