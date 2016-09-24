@@ -512,9 +512,7 @@ for l in sorted(links):
         # Rate limit the traffic transmitted on the TAP interface
         outs += 'sudo tc qdisc add dev %(tap)s handle 1: root '     \
                                 'htb default 11\n'                  \
-                'sudo tc class add dev %(tap)s parent 1: classid '  \
-                                '1:1 htb rate 10gbit\n'             \
-                'sudo tc class add dev %(tap)s parent 1:1 classid ' \
+                'sudo tc class add dev %(tap)s parent 1: classid ' \
                                 '1:11 htb rate %(speed)s\n'         \
                 % {'tap': tap, 'speed': speed}
 
