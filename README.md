@@ -258,7 +258,10 @@ where
 
 An **netem** directive allows link emulation, using the *netem* features
 of the Linux traffic control framework. Any valid netem command can be
-used (e.g. see https://wiki.linuxfoundation.org/networking/netem).
+used (e.g. see http://man7.org/linux/man-pages/man8/tc-netem.8.html).
+However, don't use the netem *rate* command unless you know what you are
+doing. The recommended way to add rate limiting is to specify a non-zero
+link speed value in the **eth** directive.
 
 The syntax is as follows:
 
@@ -270,9 +273,9 @@ where
 * NODE\_NAME is the name of the node for which the link must be emulated
 	     for the specified link
 
-Example to add a delay to node xyz in shim wan.DIF
+Example to add delay and packet loss to node xyz in shim wan.DIF
 
-	netem wan.DIF xyz delay 100ms
+	netem wan.DIF xyz delay 100ms loss random 0.1%
 
 
 
