@@ -618,6 +618,11 @@ for vmname in sorted(vms):
     if vmname in overlays:
         per_vm_overlay = overlays[vmname]
 
+    ipcm_components = ['scripting', 'console']
+    if args.manager:
+        ipcm_components.append('mad')
+    ipcm_components = ', '.join(ipcm_components)
+
     gen_files = ' '.join([gen_files_conf, gen_files_bin, overlay, per_vm_overlay])
 
     outs += ''\
@@ -662,12 +667,13 @@ for vmname in sorted(vms):
         outs +=     '$SUDO modprobe shim-eth-vlan\n'\
                     '$SUDO modprobe normal-ipcp\n'
     outs +=     '$SUDO modprobe rina-default-plugin\n'\
-                '$SUDO %(installpath)s/bin/ipcm -a \"scripting, console, mad\" '\
+                '$SUDO %(installpath)s/bin/ipcm -a \"%(ipcmcomps)s\" '\
                             '-c /etc/%(vmname)s.ipcm.conf -l %(verb)s &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
             'ENDSSH\n' % {'installpath': env_dict['installpath'],
-                          'vmname': vm['name'], 'verb': args.loglevel}
+                          'vmname': vm['name'], 'verb': args.loglevel,
+                          'ipcmcomps': ipcm_components}
 
 
 # Run the enrollment operations in an order which respect the dependencies
