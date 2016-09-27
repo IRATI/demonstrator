@@ -452,31 +452,33 @@ for dif in difs:
                 enrollments[dif].append({'enrollee': vmname,
                                          'enroller': mgmt_node_name,
                                          'lower_dif': mgmt_shim_dif_name})
+
+    elif args.enrollment_strategy == 'minimal':
+        # To generate the list of enrollments, we simulate one,
+        # using breadth-first trasversal.
+        enrolled = set([first])
+        frontier = set([first])
+        while len(frontier):
+            cur = frontier.pop()
+            for edge in dif_graphs[dif][cur]:
+                if edge[0] not in enrolled:
+                    enrolled.add(edge[0])
+                    enrollments[dif].append({'enrollee': edge[0],
+                                             'enroller': cur,
+                                             'lower_dif': edge[1]})
+                    frontier.add(edge[0])
+
+    elif args.enrollment_strategy == 'full-mesh':
+        for cur in dif_graphs[dif]:
+            for edge in dif_graphs[dif][cur]:
+                if cur < edge[0]:
+                    enrollments[dif].append({'enrollee': cur,
+                                             'enroller': edge[0],
+                                             'lower_dif': edge[1]})
+
     else:
-        if args.enrollment_strategy == 'minimal':
-            # To generate the list of enrollments, we simulate one,
-            # using breadth-first trasversal.
-            enrolled = set([first])
-            frontier = set([first])
-            while len(frontier):
-                cur = frontier.pop()
-                for edge in dif_graphs[dif][cur]:
-                    if edge[0] not in enrolled:
-                        enrolled.add(edge[0])
-                        enrollments[dif].append({'enrollee': edge[0],
-                                                 'enroller': cur,
-                                                 'lower_dif': edge[1]})
-                        frontier.add(edge[0])
-        elif args.enrollment_strategy == 'full-mesh':
-            for cur in dif_graphs[dif]:
-                for edge in dif_graphs[dif][cur]:
-                    if cur < edge[0]:
-                        enrollments[dif].append({'enrollee': cur,
-                                                 'enroller': edge[0],
-                                                 'lower_dif': edge[1]})
-        else:
-            # This is a bug
-            assert(False)
+        # This is a bug
+        assert(False)
 
     #print(neighsets)
     #print(dif_graphs[dif])
