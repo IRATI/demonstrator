@@ -315,7 +315,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*overlay\s+(\w+)\s+([\w./]+)', line)
+    m = re.match(r'\s*overlay\s+(\w+)\s+([\w.-/]+)', line)
     if m:
         vmname = m.group(1)
         opath = m.group(2)
