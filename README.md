@@ -124,6 +124,8 @@ There are a few types of declarations or directives:
                file system;
 * **netem**, to specify a per-node, per-shim-dif link emulation features
              (delay, loss, duplicate packets, etc.)
+* **enroll**, to specify manual enrollment, in case the automatic enrollment
+              strategies do not meet the user requirements
 
 Each type of declaration may occur many times.
 Note that nodes are implicitely declared by means of **eth** and **dif** lines:
@@ -276,6 +278,27 @@ where
 Example to add delay and packet loss to node xyz in shim wan.DIF
 
 	netem wan.DIF xyz delay 100ms loss random 0.1%
+
+
+### 4.7 **enroll** directive
+
+A list of **enroll** directives may be specified when the user does not want
+to use the automatic enrollment strategies supported by the demonstrator
+(e.g. minimal, full-mesh, ...). If you are not sure about what are you
+doing, don't use the **enroll** directive and rely on the automatic
+(default) strategies.
+
+The syntax of a directive is as follows:
+
+        netem DIF_NAME NODE_NAME NEIGH_NODE_NAME N_1_DIF
+
+where
+
+* DIF\_NAME is the name of the DIF where the enrollment should happen
+* NODE\_NAME is the name of the enrollee node
+* NEIGH\_NODE\_NAME is the name of the enroller node
+* N\_1\_DIF is the name of the N-1-DIF in common between enrollee and
+            enroller, to be used for the enrollment procedure
 
 
 
