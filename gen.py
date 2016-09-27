@@ -71,7 +71,7 @@ argparser.add_argument('-m', '--memory',
                        default = '128')
 argparser.add_argument('-e', '--enrollment-strategy',
                        help = "Minimal uses a spanning tree of each DIF",
-                       type = str, choices = ['minimal', 'full-mesh'],
+                       type = str, choices = ['minimal', 'full-mesh', 'manual'],
                        default = 'minimal')
 argparser.add_argument('--ring',
                        help = "Use ring topology with variable number of nodes",
@@ -209,6 +209,7 @@ dif_graphs = dict()
 app_mappings = []
 overlays = dict()
 netems = dict()
+manual_enrollments = dict()
 
 linecnt = 0
 conf_injection = True
@@ -346,6 +347,26 @@ while 1:
 
         continue
 
+    m = re.match(r'\s*enroll\s+([\w.-]+)\s+([\w.-]+)\s+([\w.-]+)\s+([\w.-]+)\s*$', line)
+    if m:
+        if args.enrollment_strategy != 'manual':
+            print('Warning: ignoring enroll directive at line %d' % linecnt)
+            continue
+
+        dif_name = m.group(1)
+        enrollee = m.group(2)
+        enroller = m.group(3)
+        n_1_dif = m.group(4)
+
+        if dif_name not in manual_enrollments:
+            manual_enrollments[dif_name] = []
+        manual_enrollments[dif_name].append({
+                                   'enrollee': enrollee,
+                                   'enroller': enroller,
+                                   'lower_dif': n_1_dif,
+                                   'linecnt': linecnt})
+        continue
+
     print("Warning: line %d not recognized" % linecnt)
 
 fin.close()
@@ -475,6 +496,39 @@ for dif in difs:
                     enrollments[dif].append({'enrollee': cur,
                                              'enroller': edge[0],
                                              'lower_dif': edge[1]})
+
+    elif args.enrollment_strategy == 'manual':
+        if dif not in manual_enrollments:
+            continue
+
+        for e in manual_enrollments[dif]:
+            if e['enrollee'] not in difs[dif]:
+                print('Warning: ignoring line %d because VM %s does '\
+                      'not belong to DIF %s' % (e['linecnt'],
+                      e['enrollee'],  dif))
+                continue
+
+            if e['enroller'] not in difs[dif]:
+                print('Warning: ignoring line %d because VM %s does '\
+                      'not belong to DIF %s' % (e['linecnt'],
+                      e['enroller'],  dif))
+                continue
+
+            if e['lower_dif'] not in neighsets or \
+                    e['enrollee'] not in neighsets[e['lower_dif']]:
+                print('Warning: ignoring line %d because VM %s cannot '\
+                      'use N-1-DIF %s' % (e['linecnt'], e['enrollee'],
+                                          e['lower_dif']))
+                continue
+
+            if e['lower_dif'] not in neighsets or \
+                    e['enroller'] not in neighsets[e['lower_dif']]:
+                print('Warning: ignoring line %d because VM %s cannot '\
+                      'use N-1-DIF %s' % (e['linecnt'], e['enroller'],
+                                          e['lower_dif']))
+                continue
+
+            enrollments[dif].append(e)
 
     else:
         # This is a bug
