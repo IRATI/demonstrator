@@ -290,7 +290,7 @@ doing, don't use the **enroll** directive and rely on the automatic
 
 The syntax of a directive is as follows:
 
-        netem DIF_NAME NODE_NAME NEIGH_NODE_NAME N_1_DIF
+        enroll DIF_NAME NODE_NAME NEIGH_NODE_NAME N_1_DIF
 
 where
 
