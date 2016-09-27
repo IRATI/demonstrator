@@ -93,6 +93,10 @@ argparser.add_argument('--manager', action='store_true',
 argparser.add_argument('--overlay',
                        help = "Overlay the specified directory in the generated image",
                        type = str)
+argparser.add_argument('--loglevel',
+                       help = "Set verbosity level",
+                       choices = ['DBG', 'INFO', 'NOTE', 'WARN', 'ERR', 'CRIT', 'ALERT', 'EMERG'],
+                       default = 'DBG')
 args = argparser.parse_args()
 
 
@@ -659,11 +663,11 @@ for vmname in sorted(vms):
                     '$SUDO modprobe normal-ipcp\n'
     outs +=     '$SUDO modprobe rina-default-plugin\n'\
                 '$SUDO %(installpath)s/bin/ipcm -a \"scripting, console, mad\" '\
-                            '-c /etc/%(vmname)s.ipcm.conf -l DEBUG &> log &\n'\
+                            '-c /etc/%(vmname)s.ipcm.conf -l %(verb)s &> log &\n'\
                 'sleep 1\n'\
                 'true\n'\
             'ENDSSH\n' % {'installpath': env_dict['installpath'],
-                          'vmname': vm['name']}
+                          'vmname': vm['name'], 'verb': args.loglevel}
 
 
 # Run the enrollment operations in an order which respect the dependencies
