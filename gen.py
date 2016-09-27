@@ -305,7 +305,7 @@ while 1:
             quit(1)
         continue
 
-    m = re.match(r'\s*appmap\s+(\w+)\s+([\w.]+)\s+(\d+)', line)
+    m = re.match(r'\s*appmap\s+(\w+)\s+([\w.]+)\s+(\d+)\s*$', line)
     if m:
         dif = m.group(1)
         apname = m.group(2)
@@ -315,7 +315,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*overlay\s+(\w+)\s+([\w.-/]+)', line)
+    m = re.match(r'\s*overlay\s+(\w+)\s+([\w.-/]+\s*$)', line)
     if m:
         vmname = m.group(1)
         opath = m.group(2)
