@@ -291,13 +291,13 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)(?:\s+([\w-]+\s*=\s*[\w-]+))?\s*$', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[\w.-]+)*)\s*$', line)
     if m:
         dif = m.group(1)
         path = m.group(2)
         ps = m.group(3)
         if m.group(4) != None:
-            parms = m.group(4).split(' ')
+            parms = m.group(4).strip().split(' ')
         else:
             parms = list()
 
