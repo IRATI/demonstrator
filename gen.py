@@ -296,10 +296,11 @@ while 1:
         dif = m.group(1)
         path = m.group(2)
         ps = m.group(3)
+        parms = list()
         if m.group(4) != None:
-            parms = m.group(4).strip().split(' ')
-        else:
-            parms = list()
+            parms_str = m.group(4).strip()
+            if parms_str != '':
+                parms = parms_str.split(' ')
 
         if dif not in dif_policies:
             dif_policies[dif] = []
