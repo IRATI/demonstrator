@@ -24,7 +24,7 @@ da_map_base = {
             "difName": "n.DIF"
         },
         {
-            "encodedAppName": "rina.apps.echotime.client-1--",
+            "encodedAppName": "traffic.generator.server-1--",
             "difName": "n.DIF"
         },
         {
