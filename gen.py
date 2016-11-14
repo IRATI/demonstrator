@@ -77,10 +77,10 @@ argparser.add_argument('--ring',
                        help = "Use ring topology with variable number of nodes",
                        type = int)
 argparser.add_argument('--kernel',
-                       help = "custom kernel image for buildroot", type = str,
+                       help = "custom kernel buildroot image", type = str,
                        default = 'buildroot/bzImage')
 argparser.add_argument('--initramfs',
-                       help = "custom initramfs image for buildroot", type = str,
+                       help = "custom initramfs buildroot image", type = str,
                        default = 'buildroot/rootfs.cpio')
 argparser.add_argument('-f', '--frontend',
                        help = "Choose which emulated NIC the nodes will use",
@@ -90,6 +90,12 @@ argparser.add_argument('--vhost', action='store_true',
                        help = "Use vhost acceleration for virtio-net frontend")
 argparser.add_argument('--manager', action='store_true',
                        help = "Add support for NMS manager and dedicated LAN")
+argparser.add_argument('--manager-kernel',
+                       help = "custom kernel buildroot image for the manager",
+                       type = str, default = 'buildroot/bzImage')
+argparser.add_argument('--manager-initramfs',
+                       help = "custom initramfs buildroot image for the manager",
+                       type = str, default = 'buildroot/rootfs.cpio')
 argparser.add_argument('--overlay',
                        help = "Overlay the specified directory in the generated image",
                        type = str)
@@ -608,6 +614,10 @@ for vmname in sorted(vms):
                  'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc,
                  'memory': args.memory, 'kernel': args.kernel,
                  'frontend': args.frontend}
+
+    if vmname == mgmt_node_name:
+        vars_dict['vmimgpath'] = args.manager_initramfs
+        vars_dict['kernel'] = args.manager_kernel
 
     outs += 'qemu-system-x86_64 '
     if not args.legacy:
