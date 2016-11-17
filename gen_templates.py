@@ -8,7 +8,7 @@ ipcmconf_base = {
         "consoleSocket": "%(varpath)s/var/run/ipcm-console.sock",
         "pluginsPaths": [
                 "%(installpath)s/lib/rinad/ipcp",
-                "/lib/modules/4.1.24-irati/extra"
+                "/lib/modules/4.1.33-irati/extra"
         ]
         },
 
