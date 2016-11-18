@@ -201,11 +201,15 @@ declaration for each IRATI DIF component that needs a non-default policy-set.
 
 The syntax for the **policy** declaration is as follows:
 
-	policy DIF_NAME COMPONENT_PATH POLICY_SET_NAME [PARAM1=VALUE1 PARAM2=VALUE2 ...]
+	policy DIF_NAME ( * | NODE_NAME_1,NODE_NAME2,... ) COMPONENT_PATH POLICY_SET_NAME [PARAM1=VALUE1 PARAM2=VALUE2 ...]
 
 where
 
 * DIF\_NAME is the name of the DIF under specification.
+
+* The second argument can be '*' or a list of comma-separated node names. In
+  the former case, the policy is deployed on all nodes in the DIF, while in
+  the latter the policy is deployed only in the listed nodes.
 
 * COMPONENT\_PATH is a string identifying the DIF component under
   specification. The string syntax is the same one used by the PRISTINE SDK

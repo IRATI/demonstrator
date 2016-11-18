@@ -297,21 +297,28 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[\w.-]+)*)\s*$', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+(\*|(?:(?:\w+,)*\w+))\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[\w.-]+)*)\s*$', line)
     if m:
         dif = m.group(1)
-        path = m.group(2)
-        ps = m.group(3)
+        nodes = m.group(2)
+        path = m.group(3)
+        ps = m.group(4)
         parms = list()
-        if m.group(4) != None:
-            parms_str = m.group(4).strip()
+        if m.group(5) != None:
+            parms_str = m.group(5).strip()
             if parms_str != '':
                 parms = parms_str.split(' ')
 
         if dif not in dif_policies:
             dif_policies[dif] = []
 
-        dif_policies[dif].append({'path': path, 'ps': ps, 'parms' : parms})
+        if nodes == '*':
+            nodes = []
+        else:
+            nodes = nodes.split(',')
+
+        dif_policies[dif].append({'path': path, 'nodes': nodes,
+                                  'ps': ps, 'parms' : parms})
         if path not in gen_templates.policy_translator:
             print('Unknown component path "%s"' % path)
             quit(1)
@@ -876,7 +883,9 @@ for vmname in vms:
 
 difconfs = dict()
 for dif in difs:
-    difconfs[dif] = copy.deepcopy(gen_templates.normal_dif_base)
+    difconfs[dif] = dict()
+    for vmname in difs[dif]:
+        difconfs[dif][vmname] = copy.deepcopy(gen_templates.normal_dif_base)
 
 for vmname in sorted(vms):
     vm = vms[vmname]
@@ -917,9 +926,8 @@ for dif in dif_ordering:
         # Shims are managed separately, in the previous loop
         continue
 
-    difconf = difconfs[dif]
-
     for vmname in difs[dif]:
+        difconf = difconfs[dif][vmname]
         vm = vms[vmname]
         ipcmconf = ipcmconfs[vmname]
 
@@ -946,8 +954,10 @@ for dif in dif_ordering:
                                     "address": 16 + vm['id']
                                 })
 
-    for policy in dif_policies[dif]:
-        gen_templates.translate_policy(difconf, policy['path'], policy['ps'], policy['parms'])
+        for policy in dif_policies[dif]:
+            if policy['nodes'] == [] or vmname in policy['nodes']:
+                gen_templates.translate_policy(difconf, policy['path'],
+                                               policy['ps'], policy['parms'])
 
 
 # Dump the DIF Allocator map
@@ -960,7 +970,8 @@ for vmname in vms:
 for dif in difs:
     for vmname in difs[dif]:
         # Dump the normal DIF configuration files
-        dict_dump_json('normal.%s.%s.dif' % (vmname, dif,), difconfs[dif], env_dict)
+        dict_dump_json('normal.%s.%s.dif' % (vmname, dif,),
+                       difconfs[dif][vmname], env_dict)
 
 
 # Dump the mapping from nodes to SSH ports
