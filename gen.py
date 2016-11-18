@@ -927,7 +927,6 @@ for dif in dif_ordering:
         continue
 
     for vmname in difs[dif]:
-        difconf = difconfs[dif][vmname]
         vm = vms[vmname]
         ipcmconf = ipcmconfs[vmname]
 
@@ -948,15 +947,18 @@ for dif in dif_ordering:
                                 "template": "normal.%s.%s.dif" % (vmname, dif,)
                                 })
 
-        difconf["knownIPCProcessAddresses"].append({
-                                    "apName":  "%s.%d.IPCP" % (dif, vm['id']),
-                                    "apInstance": "1",
-                                    "address": 16 + vm['id']
-                                })
+        # Fill in the map of IPCP addresses. This could be moved at difconfs
+        # deepcopy-time
+        for ovm in difs[dif]:
+            difconfs[dif][ovm]["knownIPCProcessAddresses"].append({
+                                        "apName":  "%s.%d.IPCP" % (dif, vm['id']),
+                                        "apInstance": "1",
+                                        "address": 16 + vm['id']
+                                    })
 
         for policy in dif_policies[dif]:
             if policy['nodes'] == [] or vmname in policy['nodes']:
-                gen_templates.translate_policy(difconf, policy['path'],
+                gen_templates.translate_policy(difconfs[dif][vmname], policy['path'],
                                                policy['ps'], policy['parms'])
 
 
