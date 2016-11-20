@@ -194,7 +194,11 @@ where
 ### 4.3 **policy** declarations
 
 A **policy** declaration is used to instruct the the tool to setup a particular
-non-default policy-set for a single IRATI component in a specific DIF.
+non-default *policy-set* for a single IRATI component in a specific DIF.
+The policy-set is an IRATI-specific object that groups together all the
+policies belonging to a certain IRATI component (which maps to a component
+of the RINA architecture). A policy-set is logically associated with an
+instance of an IPCP component in a certain DIF.
 
 Consequently, for each normal DIF there will be a separate **policy**
 declaration for each IRATI DIF component that needs a non-default policy-set.
