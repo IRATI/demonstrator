@@ -319,7 +319,7 @@ while 1:
 
         dif_policies[dif].append({'path': path, 'nodes': nodes,
                                   'ps': ps, 'parms' : parms})
-        if path not in gen_templates.policy_translator:
+        if not gen_templates.policy_path_valid(path):
             print('Unknown component path "%s"' % path)
             quit(1)
         continue

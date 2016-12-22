@@ -258,6 +258,10 @@ policy_translator = {
     'efcp.*.dtp': None,
 }
 
+# Do we know this path ?
+def policy_path_valid(path):
+    return path in policy_translator
+
 def translate_policy(difconf, path, ps, parms):
     if path in ['efcp.*.dtcp', 'efcp.*.dtp']:
         if path =='efcp.*.dtcp':
