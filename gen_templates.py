@@ -263,11 +263,10 @@ def policy_path_valid(path):
     return path in policy_translator
 
 def translate_policy(difconf, path, ps, parms):
-    if path in ['efcp.*.dtcp', 'efcp.*.dtp']:
-        if path =='efcp.*.dtcp':
-            dtcp_ps_set(difconf, ps, parms)
-        else:
-            dtp_ps_set(difconf, ps, parms)
+    if path =='efcp.*.dtcp':
+        dtcp_ps_set(difconf, ps, parms)
+    elif path == 'efcp.*.dtp':
+        dtp_ps_set(difconf, ps, parms)
     else:
         policy_translator[path](difconf, ps, parms)
 
