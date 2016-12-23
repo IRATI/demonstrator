@@ -278,7 +278,6 @@ def policy_path_valid(path):
 
     # Try to validate security configuration
     if is_security_path(path):
-            print('Validated security path "%s"' % (path,))
             return True
 
     return False
