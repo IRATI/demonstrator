@@ -222,7 +222,7 @@ normal_dif_base =  {
 
 def ps_set(d, k, v, parms):
     if k not in d:
-        d[k] = {'name': '', 'version': 1}
+        d[k] = {'name': '', 'version': '1'}
 
     if d[k]["name"] == v and "parameters" in d[k]:
         cur_names = [p["name"] for p in d[k]["parameters"]]
