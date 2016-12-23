@@ -297,7 +297,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+(\*|(?:(?:\w+,)*\w+))\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[\w.-]+)*)\s*$', line)
+    m = re.match(r'\s*policy\s+(\w+)\s+(\*|(?:(?:\w+,)*\w+))\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[/\w.-]+)*)\s*$', line)
     if m:
         dif = m.group(1)
         nodes = m.group(2)
@@ -319,7 +319,7 @@ while 1:
 
         dif_policies[dif].append({'path': path, 'nodes': nodes,
                                   'ps': ps, 'parms' : parms})
-        if path not in gen_templates.policy_translator:
+        if not gen_templates.policy_path_valid(path):
             print('Unknown component path "%s"' % path)
             quit(1)
         continue

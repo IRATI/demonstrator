@@ -219,7 +219,11 @@ normal_dif_base =  {
     }
 }
 
+
 def ps_set(d, k, v, parms):
+    if k not in d:
+        d[k] = {'name': '', 'version': '1'}
+
     if d[k]["name"] == v and "parameters" in d[k]:
         cur_names = [p["name"] for p in d[k]["parameters"]]
         for p in parms:
@@ -237,13 +241,16 @@ def ps_set(d, k, v, parms):
 
     d[k]["name"] = v
 
+
 def dtp_ps_set(d, v, parms):
     for i in range(len(d["qosCubes"])):
         ps_set(d["qosCubes"][i]["efcpPolicies"], "dtpPolicySet", v, parms)
 
+
 def dtcp_ps_set(d, v, parms):
     for i in range(len(d["qosCubes"])):
         ps_set(d["qosCubes"][i]["efcpPolicies"]["dtcpConfiguration"], "dtcpPolicySet", v, parms)
+
 
 policy_translator = {
     'rmt.pff': lambda d, v, p: ps_set(d["rmtConfiguration"]["pffConfiguration"], "policySet", v, p),
@@ -258,12 +265,64 @@ policy_translator = {
     'efcp.*.dtp': None,
 }
 
+
+def is_security_path(path):
+    sp = path.split('.')
+    return (len(sp) == 3) and (sp[0] == 'security-manager') and (sp[1] in ['auth', 'encrypt', 'ttl', 'errorcheck'])
+
+
+# Do we know this path ?
+def policy_path_valid(path):
+    if path in policy_translator:
+        return True
+
+    # Try to validate security configuration
+    if is_security_path(path):
+            return True
+
+    return False
+
+
+def translate_security_path(d, path, ps, parms):
+    u1, component, profile = path.split('.')
+    if "authSDUProtProfiles" not in d["securityManagerConfiguration"]:
+        d["securityManagerConfiguration"]["authSDUProtProfiles"] = {}
+    d = d["securityManagerConfiguration"]["authSDUProtProfiles"]
+
+    tr = {'auth': 'authPolicy', 'encrypt': 'encryptPolicy',
+          'ttl': 'TTLPolicy', 'errorcheck': 'ErrorCheckPolicy'}
+
+    if profile == 'default':
+        if profile not in d:
+            d["default"] = {}
+
+        ps_set(d["default"], tr[component], ps, parms)
+
+    else: # profile is the name of a DIF
+        if "specific" not in d:
+            d["specific"] = []
+        j = -1
+        for i in range(len(d["specific"])):
+            if d["specific"][i]["underlyingDIF"] == profile + ".DIF":
+                j = i
+                break
+
+        if j == -1: # We need to create an entry for the new DIF
+            d["specific"].append({"underlyingDIF" : profile + ".DIF"})
+
+        ps_set(d["specific"][j], tr[component], ps, parms)
+
+
 def translate_policy(difconf, path, ps, parms):
-    if path in ['efcp.*.dtcp', 'efcp.*.dtp']:
-        if path =='efcp.*.dtcp':
-            dtcp_ps_set(difconf, ps, parms)
-        else:
-            dtp_ps_set(difconf, ps, parms)
+    if path =='efcp.*.dtcp':
+        dtcp_ps_set(difconf, ps, parms)
+
+    elif path == 'efcp.*.dtp':
+        dtp_ps_set(difconf, ps, parms)
+
+    elif is_security_path(path):
+        translate_security_path(difconf, path, ps, parms)
+
     else:
         policy_translator[path](difconf, ps, parms)
 
