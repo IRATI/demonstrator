@@ -1,0 +1,54 @@
+{
+        "enrollment":
+         [      {
+                  "rule":
+                  [
+                     {"ipcpType": "whatever", "difType": "primary", "memberIpcpType": "whatever", "memberDifType": "whatever"}
+                  ]
+                  , 
+                  "capabilities":
+                  [
+                     {"ressource":"all", "op":"all"}
+                  ]
+                },
+                
+                {
+                  "rule":
+                  [
+                     {"ipcpType": "primary", "difType": "whatever", "memberIpcpType": "whatever", "memberDifType": "whatever"}
+                  ]
+                  , 
+                  "capabilities":
+                  [
+                     {"ressource":"all", "op":"all"}
+                  ]
+                },
+                
+                {
+                  "rule":
+                  [
+                    {"ipcpType": "edge", "difType": "emall", "memberIpcpType": "edge", "memberDifType": "emall"},
+                    {"ipcpType": "peer", "difType": "emall", "memberIpcpType": "edge", "memberDifType": "emall"},
+                    {"ipcpType": "customer", "difType": "emall", "memberIpcpType": "edge", "memberDifType": "emall"},
+                    {"ipcpType": "edge", "difType": "emall", "memberIpcpType": "customer", "memberDifType": "emall"},
+                    {"ipcpType": "edge", "difType": "emall", "memberIpcpType": "peer", "memberDifType": "emall"}
+                  ]
+                  , 
+                  "capabilities":
+                  [
+                    {"ressource":"/resalloc/fsos", "op": "4_M_CREATE"},
+                     {"ressource":"/difManagement/enrollment/watchdog", "op": "8_M_READ"},
+                     {"ressource":"/difManagement/enrollment", "op": "14_M_START"},
+                     {"ressource":"/difManagement/enrollment", "op": "16_M_STOP"},
+                     {"ressource":"/difManagement/nsm/dft", "op": "4_M_CREATE"},
+                     {"ressource": "/resalloc/fsos", "op": "12_M_WRITE"},
+                     {"ressource": "/fa/flows/key", "op": "4_M_CREATE"},
+                     {"ressource": "/fa/flows/key", "op": "6_M_DELETE"},
+                     {"ressource": "/difManagement/enrollment/neighbors", "op": "4_M_CREATE"},
+                     {"ressource": "/difManagement/nsm/dft", "op": "4_M_CREATE"},
+                     {"ressource": "/difManagement/opstatus", "op": "14_M_START"},
+                     {"ressource": "/difManagement/nsm/dft/key", "op": "6_M_DELETE"}
+                  ]
+                }
+         ]
+}
