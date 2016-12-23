@@ -1,0 +1,32 @@
+{
+        "IPCPProfiles":
+         [      {"apName": "emall1.1.IPCP", "ipcpType": "edge", "ipcpGroup": "customer", 
+                  "ipcpRibProfile": 
+                  [
+                        {"ribGroup": "flow", "ribType": "private"},
+                        {"ribGroup": "neighbors", "ribType": "private"}
+                  ]
+               
+                },
+                 {"apName": "emall1.8.IPCP", "ipcpType": "customer", "ipcpGroup": "customer", 
+                  "ipcpRibProfile": 
+                  [
+                        {"ribGroup": "flow", "ribType": "private"},
+                        {"ribGroup": "neighbors", "ribType": "private"}
+                  ]
+               
+                },
+                {"apName": "emall1.9.IPCP", "ipcpType": "customer", "ipcpGroup": "customer", 
+                  "ipcpRibProfile": 
+                  [
+                        {"ribGroup": "flow", "ribType": "private"},
+                        {"ribGroup": "neighbors", "ribType": "private"}
+                  ]
+               
+                }
+         ],
+         "DIFProfiles":    
+         [      {"difName": "emall1.DIF", "difType": "emall", "difGroup": "customer"}, 
+                {"difName": "emall2.DIF", "difType": "emall", "difGroup": "customer"}
+         ]
+}
