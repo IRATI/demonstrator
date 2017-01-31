@@ -17,6 +17,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+# A tool for live demonstrations and regression testing for the IRATI stack
 
 import multiprocessing
 import gen_templates
