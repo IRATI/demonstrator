@@ -328,7 +328,7 @@ packed into about 30 MB.
 A snapshot of both the kernel image and the file system the are available in
 the buildroot directory of this repository.
 The SHA identifier of the IRATI stack built into the current image is
-12d9cf0da612b57597581d16b0bfdc466947cc0a.
+11b684eaed18b6f12c1888031b4a2fc7ea29123d.
 
 Be aware that any modifications done on the VM filesystem are discarded when
 the scenario is torn down.
