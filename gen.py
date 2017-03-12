@@ -627,15 +627,14 @@ for vmname in sorted(vms):
     vm['id'] = vmid
 
     fwdp = env_dict['baseport'] + vmid
-    fwdc = fwdp + 10000
     mac = '00:0a:0a:0a:%02x:%02x' % (vmid, 99)
 
     vm['ssh'] = fwdp
 
     vars_dict = {'fwdp': fwdp, 'id': vmid, 'mac': mac,
-                 'vmimgpath': env_dict['vmimgpath'], 'fwdc': fwdc,
+                 'vmimgpath': env_dict['vmimgpath'],
                  'memory': args.memory, 'kernel': args.kernel,
-                 'frontend': args.frontend}
+                 'frontend': args.frontend, 'vmname': vmname}
 
     if vmname == mgmt_node_name:
         vars_dict['vmimgpath'] = args.manager_initramfs
@@ -649,19 +648,18 @@ for vmname in sorted(vms):
                 '-nographic ' % vars_dict
     else:
         outs += '"%(vmimgpath)s" '                                      \
-                '-snapshot '                                            \
-                '-serial tcp:127.0.0.1:%(fwdc)s,server,nowait '         \
-                                % vars_dict
+                '-snapshot ' % vars_dict
 
     outs += '-display none '                                            \
             '--enable-kvm '                                             \
             '-smp 2 '                                                   \
             '-m %(memory)sM '                                           \
-            '-device %(frontend)s,mac=%(mac)s,netdev=mgmt '                    \
+            '-device %(frontend)s,mac=%(mac)s,netdev=mgmt '             \
             '-netdev user,id=mgmt,hostfwd=tcp::%(fwdp)s-:22 '           \
             '-vga std '                                                 \
             '-pidfile rina-%(id)s.pid '                                 \
-                        % vars_dict
+            '-serial file:%(vmname)s.log '                              \
+                                % vars_dict
 
     del vars_dict
 
