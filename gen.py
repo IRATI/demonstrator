@@ -437,7 +437,7 @@ for dif in difsdeps_inc:
 del difsdeps_inc
 
 #print(difsdeps_adj)
-#print(difsdeps_inc_inc)
+#print(difsdeps_inc_cnt)
 
 # Run Kahn's algorithm to compute topological ordering on the DIFs graph.
 frontier = set()
@@ -478,7 +478,6 @@ for dif in difs:
         dif_graphs[dif][vmname] = [] # init for later use
         if first == None: # pick any node for later use
             first = vmname
-        first = vmname
         for lower_dif in difs[dif][vmname]:
             if lower_dif not in neighsets:
                 neighsets[lower_dif] = []
