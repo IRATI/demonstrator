@@ -751,9 +751,8 @@ for vmname in sorted(vms):
                        'id': vm['id'], 'vlan': port['vlan'],
                        'vmname': vm['name']}
 
-    if args.legacy:
-        outs +=     '$SUDO modprobe shim-eth-vlan\n'\
-                    '$SUDO modprobe normal-ipcp\n'
+    outs +=     '$SUDO modprobe shim-eth-vlan\n'\
+                '$SUDO modprobe normal-ipcp\n'
     outs +=     '$SUDO modprobe rina-default-plugin\n'\
                 '$SUDO %(installpath)s/bin/ipcm -a \"%(ipcmcomps)s\" '\
                             '-c /etc/%(vmname)s.ipcm.conf -l %(verb)s &> log &\n'\
