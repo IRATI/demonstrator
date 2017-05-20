@@ -724,6 +724,7 @@ for vmname in sorted(vms):
                 'set -x\n'\
                 'SUDO=%(sudo)s\n'\
                 '$SUDO hostname %(name)s\n'\
+                '$SUDO modprobe rina-irati-core\n'\
                 '$SUDO chmod a+rw /dev/irati\n'\
                 '\n'\
                 '$SUDO mv %(genfilesconf)s /etc\n'\
