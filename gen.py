@@ -662,7 +662,7 @@ for vmname in sorted(vms):
         outs += '-kernel %(kernel)s '                                   \
                 '-append "console=ttyS0" '                              \
                 '-initrd %(vmimgpath)s '                                \
-                '-nographic ' % vars_dict
+                        % vars_dict
     else:
         outs += '"%(vmimgpath)s" '                                      \
                 '-snapshot ' % vars_dict
