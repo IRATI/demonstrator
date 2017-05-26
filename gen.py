@@ -413,7 +413,8 @@ while 1:
                                    'linecnt': linecnt})
         continue
 
-    print("Warning: line %d not recognized" % linecnt)
+    print("Error: line %d not recognized" % linecnt)
+    quit()
 
 fin.close()
 
