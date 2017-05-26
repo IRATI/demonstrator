@@ -217,6 +217,10 @@ mgmt_dif_name = 'NMS'
 mgmt_node_name = 'mgr'
 
 
+if not os.path.exists(args.conf):
+    print("Error: %s not found" % args.conf)
+    quit()
+
 # Try to check that gen.conf is ASCII
 try:
     o = subprocess.check_output(['file', args.conf])
@@ -308,7 +312,7 @@ while 1:
         #        print(vm_list[i], vm_list[j])
         continue
 
-    m = re.match(r'\s*dif\s+(\w+)\s+(\w+)\s+(\w.*)$', line)
+    m = re.match(r'\s*dif\s+([\w-]+)\s+([\w-]+)\s+([\w-].*)$', line)
     if m:
         dif = m.group(1)
         vm = m.group(2)
@@ -329,7 +333,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*policy\s+(\w+)\s+(\*|(?:(?:\w+,)*\w+))\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[/\w.-]+)*)\s*$', line)
+    m = re.match(r'\s*policy\s+([\w-]+)\s+(\*|(?:(?:[\w-]+,)*[\w-]+))\s+([*\w.-]+)\s+([\w-]+)((?:\s+[\w.-]+\s*=\s*[/\w.-]+)*)\s*$', line)
     if m:
         dif = m.group(1)
         nodes = m.group(2)
@@ -356,7 +360,7 @@ while 1:
             quit(1)
         continue
 
-    m = re.match(r'\s*appmap\s+(\w+)\s+([\w.]+)\s+(\d+)\s*$', line)
+    m = re.match(r'\s*appmap\s+([\w-]+)\s+([\w.]+)\s+(\d+)\s*$', line)
     if m:
         dif = m.group(1)
         apname = m.group(2)
@@ -366,7 +370,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*overlay\s+(\w+)\s+([\w.-/]+\s*$)', line)
+    m = re.match(r'\s*overlay\s+([\w-]+)\s+([\w.-/]+\s*$)', line)
     if m:
         vmname = m.group(1)
         opath = m.group(2)
@@ -381,7 +385,7 @@ while 1:
 
         continue
 
-    m = re.match(r'\s*netem\s+(\d+)\s+(\w+)\s+(\w.*)$', line)
+    m = re.match(r'\s*netem\s+(\d+)\s+([\w-]+)\s+(\w.*)$', line)
     if m:
         dif = m.group(1)
         vmname = m.group(2)
