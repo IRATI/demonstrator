@@ -236,7 +236,12 @@ linecnt = 0
 conf_injection = True
 
 while 1:
-    line = fin.readline()
+    try:
+        line = fin.readline()
+    except UnicodeDecodeError:
+        print("Error: demo.conf must be ASCII encoded")
+        quit()
+
     if line == '':
         # EOF, try to pick from injected lines
         if len(injected_lines) > 0:
