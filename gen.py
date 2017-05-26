@@ -83,7 +83,7 @@ argparser.add_argument('--legacy', action='store_true',
                        help = "Use qcow2 image rather than buildroot ramfs")
 argparser.add_argument('-m', '--memory',
                        help = "Amount of memory in megabytes", type = int,
-                       default = '128')
+                       default = '164')
 argparser.add_argument('-e', '--enrollment-strategy',
                        help = "Minimal uses a spanning tree of each DIF",
                        type = str, choices = ['minimal', 'full-mesh', 'manual'],
