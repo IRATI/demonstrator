@@ -217,6 +217,18 @@ mgmt_dif_name = 'NMS'
 mgmt_node_name = 'mgr'
 
 
+# Try to check that gen.conf is ASCII
+try:
+    o = subprocess.check_output(['file', args.conf])
+    o = str(o).upper()
+    if o.find('ASCII') == -1:
+        print("Error: %s is not ASCII encoded" % args.conf)
+        quit()
+except Exception as e:
+    print(e)
+    pass
+
+
 ############################# Parse gen.conf ##############################
 fin = open(args.conf, 'r')
 
