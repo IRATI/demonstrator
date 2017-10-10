@@ -379,7 +379,7 @@ That's it, you successfully ran a ping application in the RINA world!
 In short, don't use this mode unless you know what you are doing.
 
 When using legacy mode, you are not using the buildroot-generated kernel and
-filesystem, already available in the repository. Instead, you have build your
+filesystem, already available in the repository. Instead, you must build your
 own VM disk image, which must contain the IRATI kernel and user-space software.
 
 The disadvantage of this approach is that it is hard to build such an image
@@ -389,7 +389,6 @@ In addition to the requirements specified in section 3, you need a QEMU VM
 image containing:
 
 * The IRATI stack installed
-* The bootloader configured to boot the IRATI kernel
 * Python
 * sudo enabled for the login username on the VM (referred to as ${username}
   in the following), with NOPASSWD, e.g. /etc/sudoers should contain something
@@ -430,11 +429,11 @@ Don't try to run ./update\_vm.sh while the test is running (i.e. you've run
 
 ### 6.2 Automatic login to the VMs
 
-In order to automatically login to the VMs, it's highly recommended to use SSH
-keys. In this way it is possible to avoid inserting the password again and
-again (during the tests):
+It's highly recommended to deploy SSH keys, so that the demonstrator scripts
+can login to the VMs without the user to manually insert the password (again
+and again):
 
-    $ ./update_vm.sh
+    $ ... # Run the VM with ssh service remapped on the host port 2222
     $ ssh-keygen -t rsa  # e.g. save the key in /home/${username}/.ssh/pristine_rsa
     $ ssh-copy-id -p2222 ${username}@localhost
     $ shutdown the VM
