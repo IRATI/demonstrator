@@ -62,7 +62,7 @@ normal_dif_base =  {
         "frameLength" : 4,
         "sequenceNumberLength" : 4,
         "ctrlSequenceNumberLength" : 4,
-        "maxPduSize" : 10000,
+        "maxPduSize" : 1470,
         "maxPduLifetime" : 60000
     },
 
