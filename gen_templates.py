@@ -64,7 +64,7 @@ normal_dif_base =  {
         "sequenceNumberLength" : 4,
         "ctrlSequenceNumberLength" : 4,
         "maxPduSize" : 1470,
-        "maxSDUSize" : 10000,
+        "maxSduSize" : 10000,
         "difFragmentation" : True,
         "maxPduLifetime" : 60000
     },
