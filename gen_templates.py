@@ -24,6 +24,7 @@ ipcmconf_base = {
         "libraryPath": "%(installpath)s/lib",
         "logPath": "%(varpath)s/var/log",
         "consoleSocket": "%(varpath)s/var/run/ipcm-console.sock",
+        "system-name": "%(sysname)s",
         "pluginsPaths": [
                 "%(installpath)s/lib/rinad/ipcp",
                 "/lib/modules/4.9.28-irati/extra"
@@ -63,6 +64,8 @@ normal_dif_base =  {
         "sequenceNumberLength" : 4,
         "ctrlSequenceNumberLength" : 4,
         "maxPduSize" : 1470,
+        "maxSDUSize" : 10000,
+        "difFragmentation" : True,
         "maxPduLifetime" : 60000
     },
 
