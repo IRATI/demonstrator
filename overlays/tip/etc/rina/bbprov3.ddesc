@@ -1,0 +1,31 @@
+{
+  "dif_name" : "bbprov3",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "isp1",
+    "dif_template" : "bbprov3.dif",
+    "registrations" : ["300"]
+  }, {
+    "system_name" : "isp2",
+    "dif_template" : "bbprov3.dif",
+    "registrations" : ["301"]
+  }, {
+    "system_name" : "isp3",
+    "dif_template" : "bbprov3.dif",
+    "registrations" : ["302"]
+  }, {
+    "system_name" : "isp4",
+    "dif_template" : "bbprov3.dif",
+    "registrations" : ["300", "301", "302"],
+    "neighbors" : [ {
+       "ipcp_name" : "isp1.bbprov3",
+       "under_dif" : "300"
+    }, {
+       "ipcp_name" : "isp2.bbprov3",
+       "under_dif" : "301"
+    }, {
+       "ipcp_name" : "isp3.bbprov3",
+       "under_dif" : "302"
+    } ]
+  } ]
+}
