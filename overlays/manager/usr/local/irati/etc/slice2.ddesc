@@ -1,0 +1,50 @@
+{
+  "dif_name" : "slice2",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "c2a",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["101"]
+  }, {
+    "system_name" : "c2b",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["103"]
+  }, {
+    "system_name" : "c2c",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["105"]
+  }, {
+    "system_name" : "pea",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["101", "underlay"],
+    "neighbors" : [ {
+       "ipcp_name" : "c2a.slice2",
+       "under_dif" : "101"
+    } ]
+  }, {
+    "system_name" : "peb",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["103", "underlay"],
+    "neighbors" : [ {
+       "ipcp_name" : "c2b.slice2",
+       "under_dif" : "103"
+    }, {
+       "ipcp_name" : "pea.slice2",
+       "under_dif" : "underlay"
+    } ]
+  }, {
+    "system_name" : "pec",
+    "dif_template" : "slice2.dif",
+    "registrations" : ["105", "underlay"],
+    "neighbors" : [ {
+       "ipcp_name" : "c2c.slice2",
+       "under_dif" : "105"
+    }, {
+       "ipcp_name" : "peb.slice2",
+       "under_dif" : "underlay"
+    }, {
+       "ipcp_name" : "pea.slice2",
+       "under_dif" : "underlay"
+    } ]
+  } ]
+}

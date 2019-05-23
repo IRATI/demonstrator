@@ -1,0 +1,17 @@
+{
+  "dif_name" : "bbprov2",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "edge2",
+    "dif_template" : "bbprov2.dif",
+    "registrations" : ["30", "40", "200"]
+  }, {
+    "system_name" : "core2",
+    "dif_template" : "bbprov2.dif",
+    "registrations" : ["200"],
+    "neighbors" : [ {
+       "ipcp_name" : "edge2.bbprov2",
+       "under_dif" : "200"
+    } ]
+  } ]
+}

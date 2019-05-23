@@ -1,0 +1,50 @@
+{
+  "dif_name" : "underlay",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "pea",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["200"]
+  }, {
+    "system_name" : "peb",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["201"]
+  }, {
+    "system_name" : "pec",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["202"]
+  }, {
+    "system_name" : "pa",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["200", "203", "205"],
+    "neighbors" : [ {
+       "ipcp_name" : "pea.underlay",
+       "under_dif" : "200"
+    } ]
+  }, {
+    "system_name" : "pb",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["201", "203", "204"],
+    "neighbors" : [ {
+       "ipcp_name" : "peb.underlay",
+       "under_dif" : "201"
+    }, {
+       "ipcp_name" : "pa.underlay",
+       "under_dif" : "203"
+    } ]
+  }, {
+    "system_name" : "pc",
+    "dif_template" : "underlay.dif",
+    "registrations" : ["202", "204", "205"],
+    "neighbors" : [ {
+       "ipcp_name" : "pec.underlay",
+       "under_dif" : "202"
+    }, {
+       "ipcp_name" : "pb.underlay",
+       "under_dif" : "204"
+    }, {
+       "ipcp_name" : "pa.underlay",
+       "under_dif" : "205"
+    } ]
+  } ]
+}

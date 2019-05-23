@@ -797,9 +797,6 @@ for dif in dif_ordering:
                                   enrollment['enroller'],
                                   enrollment['lower_dif']))
 
-        if enrollment['lower_dif'] not in shims:
-            enrollment['lower_dif'] = enrollment['lower_dif'] + '.DIF'
-
         outs += 'sleep 2\n' # important!!
         outs += ''\
             'DONE=255\n'\
@@ -807,10 +804,10 @@ for dif in dif_ordering:
             '   ssh %(sshopts)s -p %(ssh)s %(username)s@localhost << \'ENDSSH\'\n'\
             'set -x\n'\
             'SUDO=%(sudo)s\n'\
-            '$SUDO enroll.py --lower-dif %(ldif)s --dif %(dif)s.DIF '\
+            '$SUDO enroll.py --lower-dif %(ldif)s --dif %(dif)s '\
                         '--ipcm-conf /etc/%(vmname)s.ipcm.conf '\
-                        '--enrollee-name %(dif)s.%(id)s.IPCP '\
-                        '--enroller-name %(dif)s.%(pvid)s.IPCP\n'\
+                        '--enrollee-name %(vmname)s.%(dif)s '\
+                        '--enroller-name %(enroller)s.%(dif)s\n'\
             'sleep 1\n'\
             'true\n'\
             'ENDSSH\n'\
@@ -822,6 +819,7 @@ for dif in dif_ordering:
                           'pvid': vms[enrollment['enroller']]['id'],
                           'username': env_dict['username'],
                           'vmname': vm['name'],
+                          'enroller': enrollment['enroller'],
                           'dif': dif, 'ldif': enrollment['lower_dif'],
                           'sshopts': sshopts, 'sudo': sudo}
 
@@ -890,24 +888,22 @@ ipcmconfs = dict()
 if len(app_mappings) == 0:
     if len(dif_ordering) > 0:
         for adm in gen_templates.da_map_base["applicationToDIFMappings"]:
-            adm["difName"] = "%s.DIF" % (dif_ordering[-1],)
+            adm["difName"] = "%s" % (dif_ordering[-1],)
 else:
     gen_templates.da_map_base["applicationToDIFMappings"] = []
     for apm in app_mappings:
         gen_templates.da_map_base["applicationToDIFMappings"].append({
                                                     "encodedAppName": apm['name'],
-                                                    "difName": "%s.DIF" % (apm['dif'])
+                                                    "difName": "%s" % (apm['dif'])
                                             })
 
 if args.manager:
     # Add MAD/Manager configuration
     gen_templates.ipcmconf_base["addons"] = {
                     "mad": {
-                            "managerAppName": "",
-                            "NMSDIFs" : [{"DIF" : "%s.DIF" % (mgmt_dif_name)}],
                             "managerConnections" : [ {
                                         "managerAppName" : "manager-1--",
-                                        "DIF": "%s.DIF" % (mgmt_dif_name)
+                                        "DIF": "%s" % (mgmt_dif_name)
                                     }
                                 ]
                     }
@@ -915,8 +911,6 @@ if args.manager:
 
 for vmname in vms:
     ipcmconfs[vmname] = copy.deepcopy(gen_templates.ipcmconf_base)
-    if args.manager:
-        ipcmconfs[vmname]["addons"]["mad"]["managerAppName"] = "%s.mad-1--" % (vmname)
 
 difconfs = dict()
 for dif in difs:
@@ -930,8 +924,6 @@ for vmname in sorted(vms):
 
     for port in vm['ports']:
         ipcmconf["ipcProcessesToCreate"].append({
-                                "apName": "eth.%d.IPCP" % port['idx'],
-                                "apInstance": "1",
                                 "difName": port['vlan']
                                 })
 
@@ -967,28 +959,26 @@ for dif in dif_ordering:
         vm = vms[vmname]
         ipcmconf = ipcmconfs[vmname]
 
-        normal_ipcp = { "apName": "%s.%d.IPCP" % (dif, vm['id']),
-                        "apInstance": "1",
-                        "difName": "%s.DIF" % (dif,) }
+        normal_ipcp = { "difName": "%s" % (dif,) }
 
         normal_ipcp["difsToRegisterAt"] = []
         for lower_dif in difs[dif][vmname]:
             if lower_dif not in shims:
-                lower_dif = lower_dif + '.DIF'
+                lower_dif = lower_dif
             normal_ipcp["difsToRegisterAt"].append(lower_dif)
 
         ipcmconf["ipcProcessesToCreate"].append(normal_ipcp)
 
         ipcmconf["difConfigurations"].append({
-                                "name": "%s.DIF" % (dif,),
-                                "template": "normal.%s.%s.dif" % (vmname, dif,)
+                                "name": "%s" % (dif),
+                                "template": "normal.%s.%s.dif" % (vmname, dif)
                                 })
 
         # Fill in the map of IPCP addresses. This could be moved at difconfs
         # deepcopy-time
         for ovm in difs[dif]:
             difconfs[dif][ovm]["knownIPCProcessAddresses"].append({
-                                        "apName":  "%s.%d.IPCP" % (dif, vm['id']),
+                                        "apName":  "%s.%s" % (vmname, dif),
                                         "apInstance": "1",
                                         "address": 16 + vm['id']
                                     })
@@ -1004,7 +994,8 @@ dict_dump_json('da.map', gen_templates.da_map_base, env_dict)
 
 for vmname in vms:
     # Dump the IPCM configuration files
-    dict_dump_json('%s.ipcm.conf' % (vmname,), ipcmconfs[vmname], env_dict)
+    env_dict['sysname'] = '%s' %(vmname)
+    dict_dump_json('%s.ipcm.conf' % (vmname), ipcmconfs[vmname], env_dict)
 
 for dif in difs:
     for vmname in difs[dif]:
