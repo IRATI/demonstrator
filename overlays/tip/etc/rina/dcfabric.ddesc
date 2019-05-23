@@ -1,0 +1,25 @@
+{
+  "dif_name" : "dcfabric",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "dcgw",
+    "dif_template" : "dcfabric.dif",
+    "registrations" : ["400", "401"]
+  }, {
+    "system_name" : "srv2",
+    "dif_template" : "dcfabric.dif",
+    "registrations" : ["400"],
+    "neighbors" : [ {
+       "ipcp_name" : "dcgw.dcfabric",
+       "under_dif" : "400"
+    } ]
+  }, {
+    "system_name" : "srv1",
+    "dif_template" : "dcfabric.dif",
+    "registrations" : ["401"],
+    "neighbors" : [ {
+       "ipcp_name" : "dcgw.dcfabric",
+       "under_dif" : "401"
+    } ]
+  } ]
+}

@@ -1,0 +1,219 @@
+{
+    "addressPrefixes": [
+        {
+            "addressPrefix": 0, 
+            "organization": "N.Bourbaki"
+        }, 
+        {
+            "addressPrefix": 16, 
+            "organization": "IRATI"
+        }
+    ], 
+    "dataTransferConstants": {
+        "addressLength": 2, 
+        "cepIdLength": 2, 
+        "ctrlSequenceNumberLength": 4, 
+        "difFragmentation": false, 
+        "frameLength": 4, 
+        "lengthLength": 2, 
+        "maxPduLifetime": 60000, 
+        "maxPduSize": 1470, 
+        "maxSDUSize": 1470, 
+        "portIdLength": 2, 
+        "qosIdLength": 2, 
+        "rateLength": 4, 
+        "sequenceNumberLength": 4
+    }, 
+    "difType": "normal-ipc", 
+    "enrollmentTaskConfiguration": {
+        "policySet": {
+            "name": "default", 
+            "parameters": [
+                {
+                    "name": "enrollTimeoutInMs", 
+                    "value": "10000"
+                }, 
+                {
+                    "name": "watchdogPeriodInMs", 
+                    "value": "30000"
+                }, 
+                {
+                    "name": "declaredDeadIntervalInMs", 
+                    "value": "120000"
+                }, 
+                {
+                    "name": "neighborsEnrollerPeriodInMs", 
+                    "value": "0"
+                }, 
+                {
+                    "name": "useReliableNFlow", 
+                    "value": "true"
+                }
+            ], 
+            "version": "1"
+        }
+    }, 
+    "flowAllocatorConfiguration": {
+        "policySet": {
+            "name": "default", 
+            "version": "1"
+        }
+    }, 
+    "knownIPCProcessAddresses": [
+        {
+            "address": 1, 
+            "apInstance": "1", 
+            "apName": "ar3.bbprov2"
+        }, 
+        {
+            "address": 2, 
+            "apInstance": "1", 
+            "apName": "ar4.bbprov2"
+        }, 
+        {
+            "address": 3, 
+            "apInstance": "1", 
+            "apName": "edge2.bbprov2"
+        }, 
+        {
+            "address": 4, 
+            "apInstance": "1", 
+            "apName": "core2.bbprov2"
+        }
+    ], 
+    "namespaceManagerConfiguration": {
+        "policySet": {
+            "name": "default", 
+            "version": "1"
+        }
+    }, 
+    "qosCubes": [
+        {
+            "efcpPolicies": {
+                "dtcpConfiguration": {
+                    "dtcpPolicySet": {
+                        "name": "default", 
+                        "version": "0"
+                    }, 
+                    "flowControl": true, 
+                    "flowControlConfig": {
+                        "rateBased": false, 
+                        "windowBased": true, 
+                        "windowBasedConfig": {
+                            "initialCredit": 200, 
+                            "maxClosedWindowQueueLength": 1
+                        }
+                    }, 
+                    "rtxControl": false
+                }, 
+                "dtcpPresent": true, 
+                "dtpPolicySet": {
+                    "name": "default", 
+                    "version": "0"
+                }, 
+                "initialATimer": 0
+            }, 
+            "id": 1, 
+            "name": "unreliablewithflowcontrol", 
+            "orderedDelivery": true, 
+            "partialDelivery": false
+        }, 
+        {
+            "efcpPolicies": {
+                "dtcpConfiguration": {
+                    "dtcpPolicySet": {
+                        "name": "default", 
+                        "version": "0"
+                    }, 
+                    "flowControl": true, 
+                    "flowControlConfig": {
+                        "rateBased": false, 
+                        "windowBased": true, 
+                        "windowBasedConfig": {
+                            "initialCredit": 200, 
+                            "maxClosedWindowQueueLength": 1
+                        }
+                    }, 
+                    "rtxControl": true, 
+                    "rtxControlConfig": {
+                        "dataRxmsNmax": 5, 
+                        "initialRtxTime": 1000
+                    }
+                }, 
+                "dtcpPresent": true, 
+                "dtpPolicySet": {
+                    "name": "default", 
+                    "version": "0"
+                }, 
+                "initialATimer": 0
+            }, 
+            "id": 2, 
+            "maxAllowableGap": 0, 
+            "name": "reliablewithflowcontrol", 
+            "orderedDelivery": true, 
+            "partialDelivery": false
+        }
+    ], 
+    "resourceAllocatorConfiguration": {
+        "pduftgConfiguration": {
+            "policySet": {
+                "name": "default", 
+                "version": "0"
+            }
+        }
+    }, 
+    "rmtConfiguration": {
+        "pffConfiguration": {
+            "policySet": {
+                "name": "default", 
+                "version": "0"
+            }
+        }, 
+        "policySet": {
+            "name": "default", 
+            "version": "1"
+        }
+    }, 
+    "routingConfiguration": {
+        "policySet": {
+            "name": "link-state", 
+            "parameters": [
+                {
+                    "name": "objectMaximumAge", 
+                    "value": "10000"
+                }, 
+                {
+                    "name": "waitUntilReadCDAP", 
+                    "value": "5001"
+                }, 
+                {
+                    "name": "waitUntilError", 
+                    "value": "5001"
+                }, 
+                {
+                    "name": "waitUntilPDUFTComputation", 
+                    "value": "103"
+                }, 
+                {
+                    "name": "waitUntilFSODBPropagation", 
+                    "value": "101"
+                }, 
+                {
+                    "name": "waitUntilAgeIncrement", 
+                    "value": "997"
+                }, 
+                {
+                    "name": "routingAlgorithm", 
+                    "value": "Dijkstra"
+                }
+            ], 
+            "version": "1"
+        }
+    }, 
+    "securityManagerConfiguration": {
+        "policySet": {
+            "name": "default", 
+            "version": "1"
+        }
+    }
+}

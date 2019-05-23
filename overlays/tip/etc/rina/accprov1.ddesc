@@ -1,0 +1,17 @@
+{
+  "dif_name" : "accprov1",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "core1",
+    "dif_template" : "accrov1.dif",
+    "registrations" : ["bbprov1", "110"]
+  }, {
+    "system_name" : "isp1",
+    "dif_template" : "accprov1.dif",
+    "registrations" : ["110"],
+    "neighbors" : [ {
+       "ipcp_name" : "core1.accprov1",
+       "under_dif" : "110"
+    } ]
+  } ]
+}

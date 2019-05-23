@@ -1,0 +1,31 @@
+{
+  "dif_name" : "accprov3",
+  "dif_type" : "normal-ipc",
+  "ipcps" : [ {
+    "system_name" : "isp1",
+    "dif_template" : "accprov3.dif",
+    "registrations" : ["bbprov3"]
+  }, {
+    "system_name" : "isp2",
+    "dif_template" : "accprov3.dif",
+    "registrations" : ["bbprov3"]
+  }, {
+    "system_name" : "dcgw",
+    "dif_template" : "accprov3.dif",
+    "registrations" : ["303"]
+  }, {
+    "system_name" : "isp3",
+    "dif_template" : "accprov3.dif",
+    "registrations" : ["303", "bbprov3"],
+    "neighbors" : [ {
+       "ipcp_name" : "isp1.accprov3",
+       "under_dif" : "bbprov3"
+    }, {
+       "ipcp_name" : "isp2.accprov3",
+       "under_dif" : "bbprov3"
+    }, {
+       "ipcp_name" : "dcgw.accprov3",
+       "under_dif" : "303"
+    } ]
+  } ]
+}
